@@ -86,7 +86,7 @@ class DistributionTransformerBase(InServiceDistributionComponentBase, ABC):
                     f" which is allowed only for delta connected configuration i.e. phase length =2."
                 )
                 raise ValueError(msg)
-            elif pw_phases_length == 2 and wdg.num_phases != 1:
+            elif pw_phases_length == 2 and wdg.num_phases != 1 and "DELTA" in wdg.connection_type:
                 msg = (
                     f"For a single phase delta connected transformer, {pw_phases=}"
                     f" inconsistant number of phases provided for winding {wdg.num_phases=}"

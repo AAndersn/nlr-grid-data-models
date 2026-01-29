@@ -56,7 +56,7 @@ class WindingEquipment(Component):
         list[float],
         Field(
             ...,
-            description="List of per unit tap positions for each phase. Centered at 0.",
+            description="List of per unit tap positions for each phase. Centered at 1.0.",
         ),
     ]
     total_taps: Annotated[
@@ -82,11 +82,11 @@ class WindingEquipment(Component):
             )
             raise ValueError(msg)
         for tap in self.tap_positions:
-            if not abs(tap) <= self.total_taps / 2:
+            if not (self.min_tap_pu <= tap <= self.max_tap_pu):
                 msg = (
                     f"Tap position {tap=} outside allowable range"
-                    f" of [{-1*self.total_taps/2=}-{self.total_taps/2=}] for"
-                    f" total taps of {self.total_taps=}."
+                    f" of [{self.min_tap_pu=}-{self.max_tap_pu=}] for"
+                    f" this winding."
                 )
                 raise ValueError(msg)
 
