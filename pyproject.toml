@@ -33,7 +33,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pre-commit", "pytest", "pytest-cov", "pytest-doctestplus", "ruff", "docutils"]
+mcp = ["mcp>=1.0.0"]
+dev = ["pre-commit", "pytest", "pytest-cov", "pytest-doctestplus", "pytest-asyncio", "ruff", "docutils"]
 doc = [
   "sphinx",
   "pydata-sphinx-theme",
@@ -44,6 +45,7 @@ doc = [
 
 [project.scripts]
 gdm = "gdm.cli.cli:cli"
+gdm-mcp-server = "gdm.mcp.server:main"
 
 [project.urls]
 Documentation = "https://github.com/NREL-Distribution-Suites/grid-data-models#readme"
@@ -64,6 +66,7 @@ path = 'src/gdm/version.py'
 [tool.pytest.ini_options]
 pythonpath = "src"
 testpaths = ["tests"]
+asyncio_mode = "auto"
 
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.

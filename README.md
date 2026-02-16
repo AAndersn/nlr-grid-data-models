@@ -1,6 +1,6 @@
 
 
-[![Upload to PyPi](https://github.com/NREL-Distribution-Suites/grid-data-models/actions/workflows/publish_to_pypi.yml/badge.svg)](https://github.com/NREL-Distribution-Suites/grid-data-models/actions/workflows/publish_to_pypi.yml) •  [![Pytest](https://github.com/NREL-Distribution-Suites/grid-data-models/actions/workflows/pull_request_tests.yml/badge.svg)](https://github.com/NREL-Distribution-Suites/grid-data-models/actions/workflows/pull_request_tests.yml) •  [![deploy-book](https://github.com/NREL-Distribution-Suites/grid-data-models/actions/workflows/deploy.yml/badge.svg)](https://github.com/NREL-Distribution-Suites/grid-data-models/actions/workflows/deploy.yml) • ![PyPI - Downloads](https://img.shields.io/pypi/dm/grid-data-models) •  [![codecov](https://codecov.io/github/NREL-Distribution-Suites/grid-data-models/branch/main/graph/badge.svg?token=K0X11EXOX8)](https://codecov.io/github/NREL-Distribution-Suites/grid-data-models) •  [![CodeFactor](https://www.codefactor.io/repository/github/nrel-distribution-suites/grid-data-models/badge)](https://www.codefactor.io/repository/github/nrel-distribution-suites/grid-data-models)
+[![Upload to PyPi](https://github.com/NREL-Distribution-Suites/grid-data-models/actions/workflows/publish_to_pypi.yml/badge.svg)](https://github.com/NREL-Distribution-Suites/grid-data-models/actions/workflows/publish_to_pypi.yml) •  [![Pytest](https://github.com/NREL-Distribution-Suites/grid-data-models/actions/workflows/pull_request_tests.yml/badge.svg)](https://github.com/NREL-Distribution-Suites/grid-data-models/actions/workflows/pull_request_tests.yml) •  [![deploy-book](https://github.com/NREL-Distribution-Suites/grid-data-models/actions/workflows/deploy.yml/badge.svg)](https://github.com/NREL-Distribution-Suites/grid-data-models/actions/workflows/deploy.yml) • ![PyPI - Downloads](https://img.shields.io/pypi/dm/grid-data-models) •  [![codecov](https://codecov.io/github/NREL-Distribution-Suites/grid-data-models/branch/main/graph/badge.svg?token=K0X11EXOX8)](https://codecov.io/github/NREL-Distribution-Suites/grid-data-models) •  [![CodeFactor](https://www.codefactor.io/repository/github/nlr-distribution-suite/grid-data-models/badge)](https://www.codefactor.io/repository/github/nlr-distribution-suite/grid-data-models)
 
 # Grid Data Models (GDM)
 
@@ -30,6 +30,29 @@ In an effort to reduce code duplication and provide client packages a standard i
 ## How to get started?
 
 To get started, you can clone and pip install this library from [here](https://nrel-distribution-suites.github.io/grid-data-models/).
+
+## Model Context Protocol (MCP) Integration
+
+GDM includes an MCP server that enables AI assistants to interact with power system models through natural language. The MCP integration provides:
+
+- **System inspection and analysis** - Query components, analyze topology, validate connectivity
+- **Validation and diagnostics** - Diagnose errors, suggest fixes, and automatically apply corrections
+- **System operations** - Merge, split, and extract subsystems
+- **Documentation and API access** - Search documentation and get component API references
+
+To install with MCP support:
+
+```bash
+pip install -e ".[mcp]"
+```
+
+To run the MCP server:
+
+```bash
+gdm-mcp-server
+```
+
+For more details, see the [MCP documentation](docs/mcp/).
 
 
 ## Contributors

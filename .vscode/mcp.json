@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "gridDataModels": {
+      "type": "stdio",
+      "command": "/opt/homebrew/Caskroom/miniconda/base/envs/gdm/bin/gdm-mcp-server",
+      "env": {
+        "GDM_REPO_PATH": "/Users/alatif/Documents/GitHub/grid-data-models"
+      }
+    }
+  }
+}
