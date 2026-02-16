@@ -25,6 +25,10 @@ parts:
     chapters:
     - file: cim/index
     - file: cim/distribution-bus
+  - caption: MCP Server
+    chapters:
+    - file: mcp/MCP_README
+    - file: mcp/VSCODE_SETUP
   - caption: Reference Guides
     chapters:
     - file: api/index

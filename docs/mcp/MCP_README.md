@@ -1,6 +1,6 @@
 # Grid Data Models MCP Server
 
-MCP (Model Context Protocol) server integration for [grid-data-models](https://github.com/NREL-Distribution-Suites/grid-data-models).
+MCP (Model Context Protocol) server integration for [grid-data-models](https://github.com/NLR-Distribution-Suite/grid-data-models).
 
 ## Overview
 
@@ -22,7 +22,7 @@ pip install grid-data-models
 
 For development:
 ```bash
-git clone https://github.com/NREL-Distribution-Suites/grid-data-models.git
+git clone https://github.com/NLR-Distribution-Suite/grid-data-models.git
 cd grid-data-models
 pip install -e ".[dev]"
 ```
@@ -67,7 +67,7 @@ Create a `.vscode/mcp.json` file in your workspace root:
 
 > **Tip:** If VS Code can't find the command, replace `"gdm-mcp-server"` with the full path to the executable.
 
-Set `GDM_REPO_PATH` to the local clone of the [grid-data-models](https://github.com/NREL-Distribution-Suites/grid-data-models) repository (used for documentation search).
+Set `GDM_REPO_PATH` to the local clone of the [grid-data-models](https://github.com/NLR-Distribution-Suite/grid-data-models) repository (used for documentation search).
 
 #### 3. Start the server
 
@@ -82,7 +82,7 @@ Alternatively, you should see **Start** code lenses directly in the `mcp.json` f
 
 1. Open Copilot Chat (`Cmd+Shift+I` / `Ctrl+Shift+I`)
 2. Switch to **Agent** mode using the dropdown at the top of the chat panel
-3. Click the **Tools** icon (wrench) in the chat input area to verify the server's 21 tools are listed and enabled
+3. Click the **Tools** icon (wrench) in the chat input area to verify the server's 20 tools are listed and enabled
 4. Ask questions naturally — the agent automatically selects the right tools:
    - *"Get a summary of the system in /path/to/model.json"*
    - *"Diagnose validation errors in system.json and suggest fixes"*
@@ -107,7 +107,7 @@ MCP servers are also supported in Claude Desktop. Add to your Claude Desktop con
 }
 ```
 
-Restart Claude Desktop and the assistant will have access to all 21 GDM tools.
+Restart Claude Desktop and the assistant will have access to all 20 GDM tools.
 
 ### Starting the MCP Server Standalone
 
@@ -125,7 +125,7 @@ gdm-mcp-server --host localhost --port 8000
 
 ### Using with Other MCP Clients
 
-Any MCP-compatible client can connect to the server. The server exposes 21 tools for working with distribution power system models.
+Any MCP-compatible client can connect to the server. The server exposes 20 tools for working with distribution power system models.
 
 ## Available Tools
 
@@ -139,7 +139,7 @@ Any MCP-compatible client can connect to the server. The server exposes 21 tools
 - `split_by_substation` — Disaggregate system into subsystems by substation
 - `split_by_feeder` — Disaggregate system into subsystems by feeder
 
-### Inspection (8 tools)
+### Inspection (7 tools)
 - `get_system_summary` — Get component counts and overview
 - `query_components` — Filter and query components by type, substation, feeder, phases, etc.
 - `analyze_topology` — Analyze network topology and connectivity
@@ -220,8 +220,8 @@ Contributions welcome! Please open an issue or pull request on GitHub.
 ## Support
 
 For issues and questions:
-- GitHub Issues: https://github.com/NREL-Distribution-Suites/grid-data-models/issues
-- Documentation: https://github.com/NREL-Distribution-Suites/grid-data-models
+- GitHub Issues: https://github.com/NLR-Distribution-Suite/grid-data-models/issues
+- Documentation: https://github.com/NLR-Distribution-Suite/grid-data-models
 
 ## Citation
 
