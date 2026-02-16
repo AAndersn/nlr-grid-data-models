@@ -1,5 +1,6 @@
 """Diagnostic tools for identifying validation errors in distribution systems."""
 
+import contextlib
 import traceback
 from typing import Any
 from uuid import UUID
@@ -227,7 +228,7 @@ def _check_matrix_dimensions(component: Any) -> list[dict]:
         if hasattr(equipment, attr):
             matrix = getattr(equipment, attr)
             if matrix is not None:
-                try:
+                with contextlib.suppress(Exception):
                     # Check if it's a list of lists (matrix)
                     if isinstance(matrix, list) and len(matrix) > 0:
                         if isinstance(matrix[0], list):
@@ -242,8 +243,6 @@ def _check_matrix_dimensions(component: Any) -> list[dict]:
                                         "expected": f"{expected_size}x{expected_size}",
                                     }
                                 )
-                except Exception:
-                    pass  # Skip if matrix format is unexpected
 
     return issues
 

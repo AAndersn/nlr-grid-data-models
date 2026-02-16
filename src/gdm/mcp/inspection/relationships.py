@@ -1,5 +1,6 @@
 """Component relationship analysis tools."""
 
+import contextlib
 from uuid import UUID
 
 from gdm.distribution import DistributionSystem
@@ -110,11 +111,9 @@ def get_component_relationships(
 
     # Get parent components
     parents = []
-    try:
+    with contextlib.suppress(Exception):
         parent_components = system.list_parent_components(component)
         parents = [_to_component_info(parent) for parent in parent_components]
-    except Exception:
-        pass  # No parents or method not available
 
     # Get child components (components that reference this one)
     component_uuid = component.uuid

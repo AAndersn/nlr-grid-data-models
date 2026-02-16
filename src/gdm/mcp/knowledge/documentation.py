@@ -1,5 +1,6 @@
 """Documentation search and retrieval for grid-data-models."""
 
+import contextlib
 import os
 from pathlib import Path
 from typing import List, Optional, Dict, Any
@@ -79,7 +80,7 @@ def _search_md_files(docs_dir: Path, gdm_repo: Path, query_lower: str) -> list:
     """Search markdown files for query matches."""
     results = []
     for file_path in docs_dir.rglob("*.md"):
-        try:
+        with contextlib.suppress(Exception):
             content = file_path.read_text(encoding="utf-8")
             title = file_path.stem.replace("_", " ").title()
             content_lower = content.lower()
@@ -98,8 +99,6 @@ def _search_md_files(docs_dir: Path, gdm_repo: Path, query_lower: str) -> list:
                         relevance_score=float(score),
                     )
                 )
-        except Exception:
-            continue
     return results
 
 
@@ -109,7 +108,7 @@ def _search_notebooks(docs_dir: Path, gdm_repo: Path, query_lower: str) -> list:
 
     results = []
     for file_path in docs_dir.rglob("*.ipynb"):
-        try:
+        with contextlib.suppress(Exception):
             notebook = json.loads(file_path.read_text(encoding="utf-8"))
             text_content = []
             for cell in notebook.get("cells", []):
@@ -132,8 +131,6 @@ def _search_notebooks(docs_dir: Path, gdm_repo: Path, query_lower: str) -> list:
                         relevance_score=float(matches),
                     )
                 )
-        except Exception:
-            continue
     return results
 
 
@@ -273,7 +270,7 @@ def get_code_examples(topic: str) -> List[CodeExample]:
 
     # Search notebooks for code examples
     for notebook_path in docs_dir.rglob("*.ipynb"):
-        try:
+        with contextlib.suppress(Exception):
             import json
 
             notebook = json.loads(notebook_path.read_text(encoding="utf-8"))
@@ -305,8 +302,6 @@ def get_code_examples(topic: str) -> List[CodeExample]:
                                 file_path=str(notebook_path.relative_to(gdm_repo)),
                             )
                         )
-        except Exception:
-            continue
 
     return examples[:10]  # Limit to 10 examples
 

@@ -1,5 +1,6 @@
 """Inspector for querying and summarizing distribution systems."""
 
+import contextlib
 from collections import defaultdict
 from uuid import UUID
 
@@ -231,10 +232,8 @@ def get_component_details(
     component = None
 
     # Try as UUID first
-    try:
+    with contextlib.suppress(Exception):
         component = system.get_component_by_uuid(identifier)
-    except Exception:
-        pass
 
     # Try as name if UUID lookup failed
     if component is None:
