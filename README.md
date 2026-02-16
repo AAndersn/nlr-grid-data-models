@@ -1,6 +1,6 @@
 
 
-[![Upload to PyPi](https://github.com/NLR-Distribution-Suite/grid-data-models/actions/workflows/publish_to_pypi.yml/badge.svg)](https://github.com/NLR-Distribution-Suite/grid-data-models/actions/workflows/publish_to_pypi.yml) •  [![Pytest](https://github.com/NLR-Distribution-Suite/grid-data-models/actions/workflows/pull_request_tests.yml/badge.svg)](https://github.com/NLR-Distribution-Suite/grid-data-models/actions/workflows/pull_request_tests.yml) •  [![deploy-book](https://github.com/NLR-Distribution-Suite/grid-data-models/actions/workflows/deploy.yml/badge.svg)](https://github.com/NLR-Distribution-Suite/grid-data-models/actions/workflows/deploy.yml) • ![PyPI - Downloads](https://img.shields.io/pypi/dm/grid-data-models) •  [![codecov](https://codecov.io/github/NLR-Distribution-Suite/grid-data-models/branch/main/graph/badge.svg?token=K0X11EXOX8)](https://codecov.io/github/NLR-Distribution-Suite/grid-data-models) •  [![CodeFactor](https://www.codefactor.io/repository/github/nlr-distribution-suite/grid-data-models/badge)](https://www.codefactor.io/repository/github/nlr-distribution-suite/grid-data-models) • ![MCP Server](https://img.shields.io/badge/MCP_Server-enabled-brightgreen) • ![MCP Tools](https://img.shields.io/badge/MCP_Tools-20-blue)
+[![Upload to PyPi](https://github.com/NLR-Distribution-Suite/grid-data-models/actions/workflows/publish_to_pypi.yml/badge.svg)](https://github.com/NLR-Distribution-Suite/grid-data-models/actions/workflows/publish_to_pypi.yml) •  [![Pytest](https://github.com/NLR-Distribution-Suite/grid-data-models/actions/workflows/pull_request_tests.yml/badge.svg)](https://github.com/NLR-Distribution-Suite/grid-data-models/actions/workflows/pull_request_tests.yml) •  [![deploy-book](https://github.com/NLR-Distribution-Suite/grid-data-models/actions/workflows/deploy.yml/badge.svg)](https://github.com/NLR-Distribution-Suite/grid-data-models/actions/workflows/deploy.yml) • ![PyPI - Downloads](https://img.shields.io/pypi/dm/grid-data-models) •  [![codecov](https://codecov.io/github/NLR-Distribution-Suite/grid-data-models/branch/main/graph/badge.svg?token=K0X11EXOX8)](https://codecov.io/github/NLR-Distribution-Suite/grid-data-models) •  [![CodeFactor](https://www.codefactor.io/repository/github/nlr-distribution-suite/grid-data-models/badge)](https://www.codefactor.io/repository/github/nlr-distribution-suite/grid-data-models) • ![MCP Server](https://img.shields.io/badge/MCP_Server-enabled-brightgreen) • ![MCP Tools](https://img.shields.io/badge/MCP_Tools-20-blue) • [![GitHub issues](https://img.shields.io/github/issues/NLR-Distribution-Suite/grid-data-models)](https://github.com/NLR-Distribution-Suite/grid-data-models/issues) • [![License](https://img.shields.io/github/license/NLR-Distribution-Suite/grid-data-models)](https://github.com/NLR-Distribution-Suite/grid-data-models/blob/main/LICENSE.txt)
 
 # Grid Data Models (GDM)
 
@@ -57,9 +57,9 @@ For more details, see the [MCP documentation](docs/mcp/).
 
 ## Contributors
 
-- **Kapil Duwadi**
 - **Aadil Latif**
-- **Tarek Elgindy**
-- **Pedro Andres Sanchez Perez**
 - **Daniel Thom**
 - **Jeremy Keen**
+- **Kapil Duwadi**
+- **Tarek Elgindy**
+- **Pedro Andres Sanchez Perez**
