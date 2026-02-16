@@ -714,9 +714,9 @@ class DistributionSystem(System):
         self._add_node_traces(fig, nodes_gdf, color_node_by, map_type, flip_coordinates)
 
         if flip_coordinates:
-            center_x, center_y = center.x, center.y
-        else:
             center_y, center_x = center.x, center.y
+        else:
+            center_x, center_y = center.x, center.y
 
         if map_type == MapType.SCATTER_MAP:
             fig.update_layout(
@@ -772,11 +772,11 @@ class DistributionSystem(System):
             ]
 
             if not flip_coordinates:
-                lon = filt_gdf.geometry.y
-                lat = filt_gdf.geometry.x
-            else:
                 lon = filt_gdf.geometry.x
                 lat = filt_gdf.geometry.y
+            else:
+                lon = filt_gdf.geometry.y
+                lat = filt_gdf.geometry.x
 
             fig.add_trace(
                 map_obj(
@@ -820,9 +820,9 @@ class DistributionSystem(System):
                     continue
                 for linestring in linestrings:
                     if not flip_coordinates:
-                        y, x = linestring.xy
-                    else:
                         x, y = linestring.xy
+                    else:
+                        y, x = linestring.xy
                     lats = np.append(lats, y)
                     lons = np.append(lons, x)
                     types = np.append(types, [model_type] * len(y))
