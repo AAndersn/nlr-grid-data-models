@@ -1,7 +1,6 @@
 from typing import Any, Annotated
 from datetime import datetime
 
-from infrasys.models import InfraSysBaseModel
 from gdm.distribution import DistributionSystem, CatalogSystem
 
 from pydantic import Field
@@ -11,19 +10,20 @@ from rich.table import Table
 from uuid import UUID
 
 
-class PropertyEdit(InfraSysBaseModel):
+class PropertyEdit(Component):
     name: str
     value: Any
     component_uuid: UUID
 
 
-class TrackedChange(InfraSysBaseModel):
+class TrackedChange(Component):
     """
     This model represents tracked changes to the distribution system model. This is useful when there is a need
     a) to track system changes over time (e.g., a capacity expansion problem)
     b) to save multiple scenarios that apply to a given base model. (e.g., a Monte Carlo study)
     """
 
+    name: Annotated[str, Field("", description="Internal name for the tracked change")]
     scenario_name: Annotated[
         str,
         Field(

@@ -523,3 +523,20 @@ def sample_distribution_system_with_nonsequential_timeseries(
         irradiance_profile, *pvs, profile_type="PMult", profile_name="pv_profile", use_actual=False
     )
     return system
+
+
+# ── MCP test fixtures ──────────────────────────────────────────────
+
+from tests.mocks.systems import build_simple_system, build_multi_substation_system
+
+
+@pytest.fixture
+def simple_system():
+    """Simple distribution system for MCP tests."""
+    return build_simple_system()
+
+
+@pytest.fixture
+def multi_substation_system():
+    """Multi-substation distribution system for MCP tests."""
+    return build_multi_substation_system()

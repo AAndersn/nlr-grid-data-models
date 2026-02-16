@@ -31,6 +31,29 @@ In an effort to reduce code duplication and provide client packages a standard i
 
 To get started, you can clone and pip install this library from [here](https://nrel-distribution-suites.github.io/grid-data-models/).
 
+## Model Context Protocol (MCP) Integration
+
+GDM includes an MCP server that enables AI assistants to interact with power system models through natural language. The MCP integration provides:
+
+- **System inspection and analysis** - Query components, analyze topology, validate connectivity
+- **Validation and diagnostics** - Diagnose errors, suggest fixes, and automatically apply corrections
+- **System operations** - Merge, split, and extract subsystems
+- **Documentation and API access** - Search documentation and get component API references
+
+To install with MCP support:
+
+```bash
+pip install -e ".[mcp]"
+```
+
+To run the MCP server:
+
+```bash
+gdm-mcp-server
+```
+
+For more details, see the [MCP documentation](docs/mcp/).
+
 
 ## Contributors
 
