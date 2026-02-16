@@ -6,15 +6,22 @@ This guide explains how to use the Grid Data Models MCP server with GitHub Copil
 
 1. **VS Code**: Latest version with GitHub Copilot extension
 2. **GitHub Copilot**: Active subscription with Agent Mode support
-3. **Package Installed**: `grid-data-models-mcp` must be installed
+3. **Package Installed**: `grid-data-models` must be installed (the MCP server is included)
 
 ## Setup
 
 ### 1. Install the Package
 
 ```bash
-cd /Users/alatif/Documents/GitHub/grid-data-models-mcp
-pip install -e .
+pip install grid-data-models
+```
+
+Or for development from source:
+
+```bash
+git clone https://github.com/NREL-Distribution-Suites/grid-data-models.git
+cd grid-data-models
+pip install -e ".[dev]"
 ```
 
 ### 2. Verify Installation
@@ -24,79 +31,91 @@ which gdm-mcp-server
 gdm-mcp-server --help
 ```
 
+> **Note:** If you're using conda or a virtual environment, note the full path (e.g., `/opt/homebrew/Caskroom/miniconda/base/envs/gdm/bin/gdm-mcp-server`). VS Code may not activate your environment, so using the full path is recommended.
+
 ### 3. Configure VS Code
 
-The MCP server is already configured in `.vscode/settings.json`:
+Create a `.vscode/mcp.json` file in your workspace root:
 
 ```json
 {
-  "github.copilot.chat.experimental.servers": [
-    {
-      "name": "grid-data-models",
+  "servers": {
+    "gridDataModels": {
+      "type": "stdio",
       "command": "gdm-mcp-server",
       "env": {
-        "GDM_REPO_PATH": "/Users/alatif/Documents/GitHub/grid-data-models"
+        "GDM_REPO_PATH": "/path/to/grid-data-models"
       }
     }
-  ]
+  }
 }
 ```
 
-### 4. Restart VS Code
+> **Tip:** If VS Code can't find the command, replace `"gdm-mcp-server"` with the full path to the executable.
 
-Close and reopen VS Code to load the MCP server configuration.
+Set `GDM_REPO_PATH` to the local clone of the grid-data-models repository (used for documentation search).
+
+### 4. Start the Server
+
+- Open the Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`)
+- Run **MCP: List Servers**
+- Select `gridDataModels` and click **Start**
+- Check the **Output** panel (dropdown: `MCP: gridDataModels`) for any errors
+
+Alternatively, you should see **Start** code lenses directly in the `mcp.json` file.
 
 ### 5. Verify MCP Server Integration
 
-After restarting:
-- Open Copilot Chat (Cmd+Shift+I / Ctrl+Shift+I)
-- Type `@` and you should see `@grid-data-models` in the available agent list
-- Select `@grid-data-models` to interact with the MCP server tools
+After starting:
+1. Open Copilot Chat (`Cmd+Shift+I` / `Ctrl+Shift+I`)
+2. Switch to **Agent** mode using the dropdown at the top of the chat panel
+3. Click the **Tools** icon (wrench) in the chat input area
+4. Verify the server's 21 tools are listed and enabled
 
 ## Usage
 
-GitHub Copilot's Agent Mode allows it to interact with MCP servers. Once configured, you can use the `@grid-data-models` agent to interact with your distribution system models:
+Once configured, Copilot Agent Mode automatically selects the appropriate GDM tools based on your prompts. You can also reference a specific tool by typing `#` followed by the tool name (e.g., `#get_system_summary`).
 
 ### Example Prompts
 
 **Validation & Diagnostics:**
 ```
-@grid-data-models diagnose the system in model.json for validation errors
+Diagnose the system in model.json for validation errors
 
-@grid-data-models suggest fixes for the validation errors in my system
+Suggest fixes for the validation errors in my system
 
-@grid-data-models apply automatic fixes to resolve validation issues
+Apply automatic fixes to resolve validation issues
 ```
 
 **System Operations:**
 ```
-@grid-data-models merge system1.json and system2.json into combined.json
+Merge system1.json and system2.json into combined.json
 
-@grid-data-models split the system in large_model.json by substation
+Split the system in large_model.json by substation
 
-@grid-data-models split the system by feeders
+Split the system by feeders
 ```
 
 **Inspection & Analysis:**
 ```
-@grid-data-models give me a summary of the components in system.json
+Give me a summary of the components in system.json
 
-@grid-data-models query all transformers in the SUBSTATION_1 substation
+Query all transformers in the SUBSTATION_1 substation
 
-@grid-data-models analyze the topology and check for connectivity issues
+Analyze the topology and check for connectivity issues
 
-@grid-data-models find orphaned components in my system
+Find orphaned components in my system
 ```
 
 **Documentation & Learning:**
 ```
-@grid-data-models search the documentation for time series examples
+Search the documentation for time series examples
 
-@grid-data-models show me the API reference for DistributionBus
+Show me the API reference for DistributionBus
 
-@grid-data-models what fields are required for DistributionLoad?
+What fields are required for DistributionLoad?
 
-@grid-data-models give me code examples for creating a transformer
+Give me code examples for creating a transformer
 ```
 
 ## Available Tools
@@ -104,34 +123,34 @@ GitHub Copilot's Agent Mode allows it to interact with MCP servers. Once configu
 The MCP server exposes 21 tools:
 
 ### Validation (3 tools)
-- `diagnose_system` - Identify validation errors
-- `suggest_fixes` - Get fix suggestions
-- `apply_fixes` - Auto-apply fixes
+- `diagnose_system` — Identify validation errors
+- `suggest_fixes` — Get fix suggestions
+- `apply_fixes` — Auto-apply fixes
 
 ### Operations (3 tools)
-- `merge_systems` - Merge multiple systems
-- `split_by_substation` - Split by substation
-- `split_by_feeder` - Split by feeder
+- `merge_systems` — Merge multiple systems
+- `split_by_substation` — Split by substation
+- `split_by_feeder` — Split by feeder
 
-### Inspection (6 tools)
-- `get_system_summary` - Component counts and overview
-- `query_components` - Filter and query components
-- `analyze_topology` - Network topology analysis
-- `get_component_details` - Detailed component info
-- `validate_connectivity` - Check reachability
-- `find_orphaned_components` - Find unassigned components
+### Inspection (8 tools)
+- `get_system_summary` — Component counts and overview
+- `query_components` — Filter and query components
+- `analyze_topology` — Network topology analysis
+- `get_component_details` — Detailed component info
+- `validate_connectivity` — Check reachability
+- `find_orphaned_components` — Find unassigned components
+- `get_component_relationships` — Parent/child relationships
 
-### Utilities (4 tools)
-- `export_subsystem_by_buses` - Extract subsystem
-- `get_time_series_summary` - Time series overview
-- `get_component_relationships` - Parent/child relationships
+### Utilities (2 tools)
+- `export_subsystem_by_buses` — Extract subsystem
+- `get_time_series_summary` — Time series overview
 
 ### Documentation (5 tools)
-- `search_gdm_documentation` - Search docs
-- `get_api_reference` - API reference
-- `get_code_examples` - Usage examples
-- `list_available_components` - List components
-- `get_component_fields` - Field information
+- `search_gdm_documentation` — Search docs
+- `get_api_reference` — API reference
+- `get_code_examples` — Usage examples
+- `list_available_components` — List components
+- `get_component_fields` — Field information
 
 ## Troubleshooting
 
@@ -148,51 +167,66 @@ The MCP server exposes 21 tools:
    ```
 
 3. Check VS Code output panel:
-   - Open Command Palette (Cmd+Shift+P)
-   - Select "View: Toggle Output"
-   - Choose "GitHub Copilot" from dropdown
+   - Open Command Palette (`Cmd+Shift+P`)
+   - Select **View: Toggle Output**
+   - Choose **MCP: gridDataModels** from dropdown
 
 ### Server Crashes
 
 Check logs in VS Code:
 1. Open Command Palette
-2. "Developer: Show Logs"
+2. **Developer: Show Logs**
 3. Look for MCP-related errors
 
 ### Tools Not Available
 
 1. Verify package is installed:
    ```bash
-   python -c "import gdm_mcp; print(gdm_mcp.__version__)"
+   python -c "from gdm.mcp import __version__; print(__version__)"
    ```
 
 2. Reinstall if needed:
    ```bash
-   pip install --force-reinstall -e .
+   pip install --force-reinstall -e ".[dev]"
    ```
 
 ### Documentation Search Returns No Results
 
-Set the correct repository path:
-```bash
-export GDM_REPO_PATH="/Users/alatif/Documents/GitHub/grid-data-models"
+Set the correct repository path in your `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "gridDataModels": {
+      "type": "stdio",
+      "command": "gdm-mcp-server",
+      "env": {
+        "GDM_REPO_PATH": "/path/to/grid-data-models"
+      }
+    }
+  }
+}
 ```
 
-Or update `.vscode/settings.json` with the correct path.
+Or set the environment variable directly:
+```bash
+export GDM_REPO_PATH="/path/to/grid-data-models"
+```
 
 ## Tips
 
-1. **Use @ Mentions**: Start prompts with `@grid-data-models` to explicitly use the MCP server
-2. **Be Specific**: Include file paths and specific component names
-3. **Iterative Workflow**: Break complex tasks into multiple prompts
-4. **Reference Files**: Use file paths relative to workspace root
+1. **Use Agent Mode**: Switch to Agent mode in the Copilot Chat dropdown to enable tool usage
+2. **Reference Tools**: Type `#tool_name` to explicitly invoke a specific tool
+3. **Be Specific**: Include file paths and specific component names in your prompts
+4. **Iterative Workflow**: Break complex tasks into multiple prompts
+5. **Reference Files**: Use file paths relative to workspace root
 
 ## Examples
 
 ### Complete Workflow
 
 ```
-User: @grid-data-models I have a system file at tests/data/system.json. 
+User: I have a system file at tests/data/system.json.
       Can you diagnose it for validation errors?
 
 Copilot: [Uses diagnose_system tool]
@@ -201,54 +235,51 @@ Copilot: [Uses diagnose_system tool]
          2. Transformer 'xfmr_1' has invalid winding configuration
          ...
 
-User: @grid-data-models Can you suggest fixes for these errors?
+User: Can you suggest fixes for these errors?
 
 Copilot: [Uses suggest_fixes tool]
          Suggestions for fixing validation errors:
          1. Bus 'bus_1': Set voltage to 12.47 kV (common distribution voltage)
          ...
 
-User: @grid-data-models Apply the high-confidence fixes automatically
+User: Apply the high-confidence fixes automatically
 
 Copilot: [Uses apply_fixes tool]
          Applied 3 fixes successfully. 2 low-confidence fixes skipped.
-         Download fixed system: [provides JSON]
 ```
 
 ## Configuration Options
 
 ### Environment Variables
 
-Set in `.vscode/settings.json` under `env`:
+Set in `.vscode/mcp.json` under `env`:
 
 - `GDM_REPO_PATH`: Path to grid-data-models repository (for documentation search)
-- `MCP_LOG_LEVEL`: Set to `DEBUG` for verbose logging
 
-### Custom Settings
+### Debug Logging
 
-Update `.vscode/settings.json`:
+Pass `--log-level debug` for verbose logging:
 
 ```json
 {
-  "github.copilot.chat.experimental.servers": [
-    {
-      "name": "grid-data-models",
+  "servers": {
+    "gridDataModels": {
+      "type": "stdio",
       "command": "gdm-mcp-server",
-      "args": ["--log-level", "debug"],
+      "args": ["--log-level", "DEBUG"],
       "env": {
-        "GDM_REPO_PATH": "/path/to/grid-data-models",
-        "MCP_LOG_LEVEL": "DEBUG"
+        "GDM_REPO_PATH": "/path/to/grid-data-models"
       }
     }
-  ]
+  }
 }
 ```
 
 ## Support
 
-For issues:
-- GitHub Issues: https://github.com/NREL-Distribution-Suites/grid-data-models-mcp/issues
-- Documentation: https://github.com/NREL-Distribution-Suites/grid-data-models-mcp
+For issues and questions:
+- GitHub Issues: https://github.com/NREL-Distribution-Suites/grid-data-models/issues
+- Documentation: https://github.com/NREL-Distribution-Suites/grid-data-models
 
 ## Notes
 
@@ -256,4 +287,3 @@ For issues:
 - Requires GitHub Copilot subscription
 - Server runs locally and processes files on your machine
 - No data is sent to external servers except standard Copilot API calls
-- Use `@grid-data-models` prefix to invoke the MCP server in Copilot Chat

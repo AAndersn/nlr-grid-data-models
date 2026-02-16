@@ -10,8 +10,8 @@ This package provides an MCP server that exposes grid-data-models functionality 
 
 - **Validation Tools**: Diagnose validation errors, suggest fixes, and apply automatic corrections
 - **System Operations**: Merge multiple distribution systems, split systems by substation or feeder
-- **Inspection Tools**: Query components, analyze topology, get system summaries
-- **Utility Tools**: Export subsystems, manage time series, find relationships
+- **Inspection Tools**: Query components, analyze topology, get system summaries, find orphaned components, explore relationships
+- **Utility Tools**: Export subsystems, manage time series
 - **Documentation/Knowledge**: Search GDM docs, get API references, view code examples
 
 ## Installation
@@ -45,7 +45,7 @@ Verify the server command is available:
 which gdm-mcp-server
 ```
 
-> **Note:** If you're using conda or a virtual environment, note the full path to the executable (e.g., `/opt/homebrew/Caskroom/miniconda/base/bin/gdm-mcp-server`). VS Code may not activate your environment, so using the full path is recommended.
+> **Note:** If you're using conda or a virtual environment, note the full path to the executable (e.g., `/opt/homebrew/Caskroom/miniconda/base/envs/gdm/bin/gdm-mcp-server`). VS Code may not activate your environment, so using the full path is recommended.
 
 #### 2. Create the MCP configuration file
 
@@ -90,7 +90,7 @@ Alternatively, you should see **Start** code lenses directly in the `mcp.json` f
    - *"Show me code examples for working with time series"*
 5. To reference a specific tool, type `#` followed by the tool name (e.g., `#get_system_summary`)
 
-See [docs/VSCODE_SETUP.md](docs/VSCODE_SETUP.md) for more detailed examples.
+See [VSCODE_SETUP.md](VSCODE_SETUP.md) for more detailed examples.
 
 ### Using with Claude Desktop
 
@@ -129,42 +129,42 @@ Any MCP-compatible client can connect to the server. The server exposes 21 tools
 
 ## Available Tools
 
-### Validation
-- `diagnose_system` - Identify validation errors in a distribution system
-- `suggest_fixes` - Get fix suggestions for validation errors
-- `apply_fixes` - Automatically apply fixes to resolve validation errors
+### Validation (3 tools)
+- `diagnose_system` — Identify validation errors in a distribution system
+- `suggest_fixes` — Get fix suggestions for validation errors
+- `apply_fixes` — Automatically apply fixes to resolve validation errors
 
-### System Operations
-- `merge_systems` - Merge multiple distribution systems into one
-- `split_by_substation` - Disaggregate system into subsystems by substation
-- `split_by_feeder` - Disaggregate system into subsystems by feeder
+### System Operations (3 tools)
+- `merge_systems` — Merge multiple distribution systems into one
+- `split_by_substation` — Disaggregate system into subsystems by substation
+- `split_by_feeder` — Disaggregate system into subsystems by feeder
 
-### Inspection
-- `get_system_summary` - Get component counts and overview
-- `query_components` - Filter and query components
-- `analyze_topology` - Analyze network topology and connectivity
-- `get_component_details` - Get detailed information about a component
-- `validate_connectivity` - Check if all components are reachable from source
+### Inspection (8 tools)
+- `get_system_summary` — Get component counts and overview
+- `query_components` — Filter and query components by type, substation, feeder, phases, etc.
+- `analyze_topology` — Analyze network topology and connectivity
+- `get_component_details` — Get detailed information about a component
+- `validate_connectivity` — Check if all components are reachable from source
+- `find_orphaned_components` — Find components without substation/feeder assignment
+- `get_component_relationships` — Get parent/child relationships for a component
 
-### Utilities
-- `export_subsystem_by_buses` - Extract subsystem by bus list
-- `get_time_series_summary` - Get overview of time series data
-- `find_orphaned_components` - Find components without substation/feeder assignment
-- `get_component_relationships` - Get parent/child relationships
+### Utilities (2 tools)
+- `export_subsystem_by_buses` — Extract subsystem by bus list
+- `get_time_series_summary` — Get overview of time series data
 
-### Documentation/Knowledge
-- `search_gdm_documentation` - Search grid-data-models documentation for relevant content
-- `get_api_reference` - Get API reference for a specific component class
-- `get_code_examples` - Get code examples for specific topics
-- `list_available_components` - List all available distribution component types
-- `get_component_fields` - Get detailed field information for a component type
+### Documentation / Knowledge (5 tools)
+- `search_gdm_documentation` — Search grid-data-models documentation for relevant content
+- `get_api_reference` — Get API reference for a specific component class
+- `get_code_examples` — Get code examples for specific topics
+- `list_available_components` — List all available distribution component types
+- `get_component_fields` — Get detailed field information for a component type
 
 ## Example Usage
 
 ### Validating and Fixing a System
 
 ```python
-# Through MCP client (e.g., Claude)
+# Through MCP client (e.g., Claude or Copilot)
 "Diagnose the system in model.json and apply automatic fixes"
 ```
 
@@ -211,7 +211,7 @@ ruff check src/
 
 ## License
 
-BSD 3-Clause License. See [LICENSE.txt](LICENSE.txt) for details.
+BSD 3-Clause License. See [LICENSE.txt](../../LICENSE.txt) for details.
 
 ## Contributing
 
