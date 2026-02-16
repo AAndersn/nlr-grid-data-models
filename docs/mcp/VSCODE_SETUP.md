@@ -19,7 +19,7 @@ pip install grid-data-models
 Or for development from source:
 
 ```bash
-git clone https://github.com/NREL-Distribution-Suites/grid-data-models.git
+git clone https://github.com/NLR-Distribution-Suite/grid-data-models.git
 cd grid-data-models
 pip install -e ".[dev]"
 ```
@@ -70,7 +70,7 @@ After starting:
 1. Open Copilot Chat (`Cmd+Shift+I` / `Ctrl+Shift+I`)
 2. Switch to **Agent** mode using the dropdown at the top of the chat panel
 3. Click the **Tools** icon (wrench) in the chat input area
-4. Verify the server's 21 tools are listed and enabled
+4. Verify the server's 20 tools are listed and enabled
 
 ## Usage
 
@@ -120,7 +120,7 @@ Give me code examples for creating a transformer
 
 ## Available Tools
 
-The MCP server exposes 21 tools:
+The MCP server exposes 20 tools:
 
 ### Validation (3 tools)
 - `diagnose_system` — Identify validation errors
@@ -132,7 +132,7 @@ The MCP server exposes 21 tools:
 - `split_by_substation` — Split by substation
 - `split_by_feeder` — Split by feeder
 
-### Inspection (8 tools)
+### Inspection (7 tools)
 - `get_system_summary` — Component counts and overview
 - `query_components` — Filter and query components
 - `analyze_topology` — Network topology analysis
@@ -278,8 +278,8 @@ Pass `--log-level debug` for verbose logging:
 ## Support
 
 For issues and questions:
-- GitHub Issues: https://github.com/NREL-Distribution-Suites/grid-data-models/issues
-- Documentation: https://github.com/NREL-Distribution-Suites/grid-data-models
+- GitHub Issues: https://github.com/NLR-Distribution-Suite/grid-data-models/issues
+- Documentation: https://github.com/NLR-Distribution-Suite/grid-data-models
 
 ## Notes
 
