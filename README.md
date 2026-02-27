@@ -21,7 +21,7 @@ In an effort to reduce code duplication and provide client packages a standard i
 - **Built-in validation layer:** Use of [pydantic](https://docs.pydantic.dev/latest/) allows us to validate model fields.
 - **Time series data management:** GDM uses [infrasys](https://github.nrel.gov/CADET/infrastructure_systems) package which enables [efficient time series data management](https://nrel.github.io/infrasys/explanation/time_series.html) by sharing arrays across components and offloading system memory. For example, we can attach time series power consumption data to a load profile.
 - **Built-in unit conversion:** GDM leverages [pint](https://pint.readthedocs.io/en/stable/) for unit conversion for power system quantities. For example, power, voltage, time, etc.
-- **JSON serialization/deserialization:** GDM uses [infrasys](https://github.com/NREL/infrasys) to serialize and deserialize distribution system components to/from JSON.
+- **JSON serialization/deserialization:** GDM uses [infrasys](https://github.com/NatLabRockies/infrasys) to serialize and deserialize distribution system components to/from JSON.
 - **Track System Changes:** Supports tracking changes within a distribution model (both temporal and scenario-based static updates), enabling powerful scenario management capabilities.
 - **Graph-Based Analysis:** Exposes a connectivity graph using NetworkX, allowing advanced graph-based algorithms and visualizations.
 - **Interoperability:** Easily integrates with existing tools.
