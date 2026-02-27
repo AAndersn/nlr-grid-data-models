@@ -41,7 +41,7 @@ class MatrixImpedanceBranch(DistributionBranchBase):
         """Kron reduce the branch to remove neutral."""
 
         self.equipment.kron_reduce(self.phases)
-        self.phases = [p for p in self.phases if p != Phase.N]
+        object.__setattr__(self, "phases", [p for p in self.phases if p != Phase.N])
 
     @classmethod
     def example(cls) -> "MatrixImpedanceBranch":
