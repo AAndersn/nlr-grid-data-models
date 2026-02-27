@@ -26,7 +26,7 @@ dependencies = [
   "pydantic",
   "infrasys~=1.0", 
   "importlib_metadata",
-  "click~=8.1.7",
+  "typer",
   "pandas~=2.2.3",
   "geopandas",
   "plotly",
@@ -44,7 +44,7 @@ doc = [
 ]
 
 [project.scripts]
-gdm = "gdm.cli.cli:cli"
+gdm = "gdm.cli.cli:app"
 gdm-mcp-server = "gdm.mcp.server:main"
 
 [project.urls]

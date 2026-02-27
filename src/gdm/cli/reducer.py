@@ -1,59 +1,51 @@
+from enum import Enum
 from pathlib import Path
 import shutil
-import click
+from typing import Annotated
 
-from gdm.distribution.network.reducer import reduce_to_three_phase_system
+import typer
+
+from gdm.distribution.model_reduction.reducer import reduce_to_three_phase_system
 from gdm.distribution.distribution_system import DistributionSystem
 from gdm.exceptions import FolderAlreadyExistsError
 
 
-@click.command()
-@click.option(
-    "-g",
-    "--gdm-file",
-    type=str,
-    help="GDM system JSON file path.",
-)
-@click.option(
-    "-t",
-    "--target-file",
-    type=str,
-    help="Target GDM system JSON file path.",
-)
-@click.option(
-    "-f",
-    "--force",
-    is_flag=True,
-    default=False,
-    help="Force delete the target GDM system file if already exists.",
-)
-@click.option(
-    "-r",
-    "--reducer",
-    type=click.Choice(["three_phase"]),
-    help="Delete target GDM file forcefully if exists.",
-)
-@click.option(
-    "-ts",
-    "--timeseries",
-    is_flag=True,
-    default=False,
-    help="Delete target GDM file forcefully if exists.",
-)
-def reduce(gdm_file: str, target_file: str, force: bool, reducer: str, timeseries: bool):
-    target_file: Path = Path(target_file)
-    if force and target_file.exists():
-        shutil.rmtree(target_file.parent / f"{target_file.stem}_time_series")
-        target_file.unlink()
+class ReducerType(str, Enum):
+    three_phase = "three_phase"
 
-    if not force and target_file.exists():
+
+def reduce(
+    gdm_file: Annotated[str, typer.Option("-g", "--gdm-file", help="GDM system JSON file path.")],
+    target_file: Annotated[
+        str, typer.Option("-t", "--target-file", help="Target GDM system JSON file path.")
+    ],
+    force: Annotated[
+        bool,
+        typer.Option(
+            "-f", "--force", help="Force delete the target GDM system file if already exists."
+        ),
+    ] = False,
+    reducer: Annotated[
+        ReducerType, typer.Option("-r", "--reducer", help="Reducer type to apply.")
+    ] = ReducerType.three_phase,
+    timeseries: Annotated[
+        bool,
+        typer.Option("-ts", "--timeseries", help="Include timeseries data in the reduced system."),
+    ] = False,
+):
+    """Reduce a GDM distribution system."""
+    target_path = Path(target_file)
+    if force and target_path.exists():
+        shutil.rmtree(target_path.parent / f"{target_path.stem}_time_series")
+        target_path.unlink()
+
+    if not force and target_path.exists():
         raise FolderAlreadyExistsError(
-            f"""{target_file} already exists. Consider
-                                       deleting it first."""
+            f"{target_path} already exists. Consider deleting it first."
         )
     sys = DistributionSystem.from_json(gdm_file)
     reducer_func = {"three_phase": reduce_to_three_phase_system}
     new_sys_name = sys.name + "_reduced" if sys.name else None
-    new_sys = reducer_func[reducer](sys, new_sys_name, timeseries)
-    new_sys.to_json(target_file)
-    click.echo(str(target_file))
+    new_sys = reducer_func[reducer.value](sys, new_sys_name, timeseries)
+    new_sys.to_json(target_path)
+    typer.echo(str(target_path))

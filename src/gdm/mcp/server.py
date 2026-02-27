@@ -7,9 +7,9 @@ grid-data-models functionality as tools for AI agents.
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any
 
-import click
+import typer
 from gdm.distribution import DistributionSystem
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
@@ -741,12 +741,14 @@ async def _get_component_fields(args: dict) -> dict:
     return {"component_name": component_name, "fields": fields}
 
 
-@click.command()
-@click.option("--host", default="localhost", help="Server host")
-@click.option("--port", default=8000, type=int, help="Server port")
-@click.option("--log-level", default="INFO", help="Logging level")
-@click.option("--allow-auto-fix", is_flag=True, help="Allow auto-fix operations")
-def main(host: str, port: int, log_level: str, allow_auto_fix: bool):
+def _run_server(
+    host: Annotated[str, typer.Option(help="Server host")] = "localhost",
+    port: Annotated[int, typer.Option(help="Server port")] = 8000,
+    log_level: Annotated[str, typer.Option(help="Logging level")] = "INFO",
+    allow_auto_fix: Annotated[
+        bool, typer.Option("--allow-auto-fix", help="Allow auto-fix operations")
+    ] = False,
+):
     """Start the GDM MCP server."""
     # Set log level
     logging.getLogger("gdm_mcp").setLevel(log_level.upper())
@@ -763,6 +765,10 @@ def main(host: str, port: int, log_level: str, allow_auto_fix: bool):
             await app.run(read_stream, write_stream, app.create_initialization_options())
 
     asyncio.run(run())
+
+
+def main():
+    typer.run(_run_server)
 
 
 if __name__ == "__main__":

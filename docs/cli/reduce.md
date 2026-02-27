@@ -2,24 +2,27 @@
 
 ## Network Reduction
 
-You can use `reduce` command to perform network reduction is GDM system.
+You can use the `reduce` command to perform network reduction on a GDM system.
 
 ```bash
-Usage: gdm reduce [OPTIONS]
+Usage: gdm [OPTIONS]
+
+ Reduce a GDM distribution system.
 
 Options:
-  -g, --gdm-file TEXT          GDM system JSON file path.
-  -t, --target-file TEXT       Target GDM system JSON file path.
+  -g, --gdm-file TEXT          GDM system JSON file path.  [required]
+  -t, --target-file TEXT       Target GDM system JSON file path.  [required]
   -f, --force                  Force delete the target GDM system file if
                                already exists.
-  -r, --reducer [three_phase]  Delete target GDM file forcefully if exists.
-  -ts, --timeseries            Delete target GDM file forcefully if exists.
+  -r, --reducer [three_phase]  Reducer type to apply.  [default: three_phase]
+  -ts, --timeseries            Include timeseries data in the reduced system.
+  --install-completion         Install completion for the current shell.
+  --show-completion            Show completion for the current shell.
   --help                       Show this message and exit.
-
 ```
 
-Following command converts test.json file to test_reduced.json file including timeseries data.
+Following command converts `test.json` to `test_reduced.json` including timeseries data.
 
 ```bash
-gdm redcue -g 'test.json' -t 'test_reduced.json' -r "three_phase" -ts
+gdm reduce -g 'test.json' -t 'test_reduced.json' -r "three_phase" -ts
 ```
