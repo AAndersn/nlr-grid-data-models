@@ -470,7 +470,6 @@ class DistributionSystem(System):
             bus_1 = cycle[i]
             bus_2 = cycle[(i + 1) % len(cycle)]
             edge_data = self.get_undirected_graph().get_edge_data(bus_1, bus_2)
-            print(bus_1, bus_2, edge_data)
             if edge_data:
                 for key, data in edge_data.items():
                     if issubclass(data.get("type"), MatrixImpedanceSwitch):
