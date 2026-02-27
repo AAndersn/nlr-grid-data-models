@@ -112,7 +112,6 @@ def _reduce_system(
                     model_type=model_type,
                     split_phase_mapping=split_phase_mapping,
                 )
-                # print(model_type.__name__, agg_component)
                 reduced_system.add_component(agg_component)
                 agg_comp = reduced_system.get_component(model_type, agg_component.name)
                 if agg_timeseries:
