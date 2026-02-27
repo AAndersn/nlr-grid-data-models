@@ -220,7 +220,40 @@ class DistributionSystem(System):
                 edge.buses[1].name,
                 **data,
             )
+
+        # Validate that every phase on each bus is served by at least one connected component.
+        self._warn_uncovered_bus_phases(edges)
+
         return graph
+
+    def _warn_uncovered_bus_phases(
+        self,
+        edges: list,
+    ) -> None:
+        """Log a warning if any bus has phases not connected to any component."""
+        bus_covered_phases: dict[str, set] = {
+            node.name: set() for node in self.get_components(DistributionBus)
+        }
+        for edge in edges:
+            if isinstance(edge, DistributionBranchBase):
+                edge_phase_set = set(edge.phases)
+                for bus in edge.buses:
+                    bus_covered_phases[bus.name] |= edge_phase_set
+            elif isinstance(edge, DistributionTransformerBase):
+                for bus, winding_phases in zip(edge.buses, edge.winding_phases):
+                    bus_covered_phases[bus.name] |= set(winding_phases)
+
+        uncovered: dict[str, list] = {}
+        for bus in self.get_components(DistributionBus):
+            missing = set(bus.phases) - bus_covered_phases[bus.name]
+            if missing:
+                uncovered[bus.name] = sorted(p.value for p in missing)
+
+        if uncovered:
+            details = "; ".join(f"{name}: {phases}" for name, phases in uncovered.items())
+            logger.warning(
+                f"The following buses have phases not connected to any component: {details}"
+            )
 
     def _add_to_subsystem(
         self,
