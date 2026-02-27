@@ -6,7 +6,7 @@ GDM is a Python package containing data models for distribution system assets an
 To reduce code duplication and provide client packages with a standard interface to interact with power system data, a group of research engineers at NREL is developing standard data models. Features include:
 
 - **Built-in Validation Layer:** The use of [pydantic](https://docs.pydantic.dev/latest/) allows for the validation of model fields.
-- **Time Series Data Management:** GDM uses the [infrasys](https://github.nrel.gov/CADET/infrastructure_systems) package, enabling [efficient time series data management](https://nrel.github.io/infrasys/explanation/time_series.html) by sharing arrays across components and offloading system memory. For example, time series power consumption data can be attached to a load profile.
+- **Time Series Data Management:** GDM uses the [infrasys](https://github.nrel.gov/CADET/infrastructure_systems) package, enabling [efficient time series data management](https://natlabrockies.github.io/infrasys/explanation/time_series.html) by sharing arrays across components and offloading system memory. For example, time series power consumption data can be attached to a load profile.
 - **Built-in Unit Conversion:** GDM leverages [pint](https://pint.readthedocs.io/en/stable/) for unit conversion of power system quantities, such as power, voltage, and time.
 - **JSON Serialization/Deserialization:** GDM uses [infrasys](https://github.com/NREL/infrasys) to serialize and deserialize distribution system components to/from JSON.
 - **Track System Changes:** Supports tracking changes within a distribution model (both temporal and scenario-based static updates), enabling powerful scenario management capabilities.
