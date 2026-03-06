@@ -2,7 +2,7 @@
 
 [![](../../models/MatrixImpedanceRecloserEquipment.svg)](../../models/MatrixImpedanceRecloserEquipment.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.equipment.MatrixImpedanceRecloserEquipment
    :members: __init__
    :inherited-members: Component
@@ -11,7 +11,7 @@
 
 [![](../../models/RecloserControllerEquipment.svg)](../../models/RecloserControllerEquipment.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.equipment.RecloserControllerEquipment
    :members: __init__
    :inherited-members: Component

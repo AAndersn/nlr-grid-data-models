@@ -2,7 +2,7 @@
 
 [![](../../models/DistributionBus.svg)](../../models/DistributionBus.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.components.DistributionBus
    :members: 
    :inherited-members: Component

@@ -2,7 +2,7 @@
 
 [![](../../models/PhaseCapacitorEquipment.svg)](../../models/PhaseCapacitorEquipment.svg) 
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.equipment.PhaseCapacitorEquipment
    :members: 
    :inherited-members: Component
@@ -11,7 +11,7 @@
 
 [![](../../models/CapacitorEquipment.svg)](../../models/CapacitorEquipment.svg) 
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.equipment.CapacitorEquipment
    :members: 
    :inherited-members: Component

@@ -2,7 +2,7 @@
 
 [![](../../models/InverterEquipment.svg)](../../models/InverterEquipment.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.equipment.InverterEquipment
    :members: __init__
    :inherited-members: Component

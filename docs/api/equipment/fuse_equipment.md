@@ -2,7 +2,7 @@
 
 [![](../../models/MatrixImpedanceFuseEquipment.svg)](../../models/MatrixImpedanceFuseEquipment.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.equipment.MatrixImpedanceFuseEquipment
    :members: __init__
    :inherited-members: Component

@@ -2,7 +2,7 @@
 
 [![](../../models/SequenceImpedanceBranch.svg)](../../models/SequenceImpedanceBranch.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.components.SequenceImpedanceBranch
    :members: 
    :inherited-members: Component
@@ -11,7 +11,7 @@
 
 [![](../../models/MatrixImpedanceBranch.svg)](../../models/MatrixImpedanceBranch.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.components.MatrixImpedanceBranch
    :members: 
    :inherited-members: Component
@@ -20,7 +20,7 @@
 
 [![](../../models/GeometryBranch.svg)](../../models/GeometryBranch.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.components.GeometryBranch
    :members: __init__
    :inherited-members: Component

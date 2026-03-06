@@ -2,7 +2,7 @@
 
 [![](../../models/DistributionTransformer.svg)](../../models/DistributionTransformer.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.components.DistributionTransformer
    :members: __init__
    :inherited-members: Component

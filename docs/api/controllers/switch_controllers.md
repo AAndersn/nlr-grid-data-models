@@ -2,7 +2,7 @@
 
 [![](../../models/DistributionSwitchController.svg)](../../models/DistributionSwitchController.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.DistributionSwitchController
    :members: __init__
    :inherited-members: Component

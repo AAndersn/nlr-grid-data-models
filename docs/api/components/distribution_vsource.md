@@ -2,7 +2,7 @@
 
 [![](../../models/DistributionVoltageSource.svg)](../../models/DistributionVoltageSource.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.components.DistributionVoltageSource
    :members: __init__
    :inherited-members: Component

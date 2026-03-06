@@ -40,7 +40,44 @@ project:
     - title: Reference Guides
       children:
         - file: api/index.md
+          children:
+            - file: api/components/distribution_battery.md
+            - file: api/components/distribution_bus.md
+            - file: api/components/distribution_branch.md
+            - file: api/components/distribution_capacitor.md
+            - file: api/components/distribution_feeder.md
+            - file: api/components/distribution_substation.md
+            - file: api/components/distribution_load.md
+            - file: api/components/distribution_transformer.md
+            - file: api/components/distribution_regulator.md
+            - file: api/components/distribution_fuse.md
+            - file: api/components/distribution_switch.md
+            - file: api/components/distribution_recloser.md
+            - file: api/components/distribution_vsource.md
+            - file: api/components/distribution_solar.md
+            - file: api/equipment/battery_equipment.md
+            - file: api/equipment/branch_equipment.md
+            - file: api/equipment/capacitor_equipment.md
+            - file: api/equipment/load_equipment.md
+            - file: api/equipment/distribution_transformer_equipment.md
+            - file: api/equipment/vsource_equipment.md
+            - file: api/equipment/distribution_wires.md
+            - file: api/equipment/fuse_equipment.md
+            - file: api/equipment/switch_equipment.md
+            - file: api/equipment/recloser_equipment.md
+            - file: api/equipment/solar_equipment.md
+            - file: api/equipment/inverter_equipment.md
+            - file: api/controllers/capacitor_controllers.md
+            - file: api/controllers/regulator_controllers.md
+            - file: api/controllers/inverter_controllers.md
+            - file: api/controllers/switch_controllers.md
+            - file: api/controllers/recloser_controllers.md
+            - file: api/distribution_enum.md
+            - file: api/limitset.md
+            - file: api/quantities.md
         - file: cli/index.md
+          children:
+            - file: cli/reduce.md
 site:
   options:
     logo: gdm_logo.jpeg

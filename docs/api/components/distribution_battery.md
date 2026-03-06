@@ -2,7 +2,7 @@
 
 [![](../../models/DistributionBattery.svg)](../../models/DistributionBattery.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.components.DistributionBattery
    :members: __init__
    :inherited-members: Component

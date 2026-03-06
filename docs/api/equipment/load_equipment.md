@@ -2,7 +2,7 @@
 
 [![](../../models/PhaseLoadEquipment.svg)](../../models/PhaseLoadEquipment.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.equipment.PhaseLoadEquipment
    :members: __init__
    :inherited-members: Component
@@ -11,7 +11,7 @@
 
 [![](../../models/LoadEquipment.svg)](../../models/LoadEquipment.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.equipment.LoadEquipment
    :members: __init__
    :inherited-members: Component

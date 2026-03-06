@@ -1,7 +1,7 @@
 # Quantities
 
 
-```{eval-rst}
+```{code-block} rst
 .. automodule:: gdm.quantities
     :members: 
 
