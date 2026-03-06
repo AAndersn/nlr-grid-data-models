@@ -2,7 +2,7 @@
 
 [![](../../models/DistributionRecloserController.svg)](../../models/DistributionRecloserController.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.DistributionRecloserController
    :members: __init__
    :inherited-members: Component

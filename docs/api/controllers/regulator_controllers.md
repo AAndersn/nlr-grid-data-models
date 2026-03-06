@@ -2,7 +2,7 @@
 
 [![](../../models/RegulatorController.svg)](../../models/RegulatorController.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.RegulatorController
    :members: __init__
    :inherited-members: Component

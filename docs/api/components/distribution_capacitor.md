@@ -2,7 +2,7 @@
 
 [![](../../models/DistributionCapacitor.svg)](../../models/DistributionCapacitor.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.components.DistributionCapacitor
    :members: 
    :inherited-members: Component

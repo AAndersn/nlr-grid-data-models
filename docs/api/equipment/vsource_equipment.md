@@ -2,7 +2,7 @@
 
 [![](../../models/PhaseVoltageSourceEquipment.svg)](../../models/PhaseVoltageSourceEquipment.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.equipment.PhaseVoltageSourceEquipment
    :members: __init__
    :inherited-members: Component
@@ -11,7 +11,7 @@
 
 [![](../../models/VoltageSourceEquipment.svg)](../../models/VoltageSourceEquipment.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.equipment.VoltageSourceEquipment
    :members: __init__
    :inherited-members: Component

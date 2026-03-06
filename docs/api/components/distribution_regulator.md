@@ -3,7 +3,7 @@
 
 [![](../../models/DistributionRegulator.svg)](../../models/DistributionRegulator.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.components.DistributionRegulator
    :members: __init__
    :inherited-members: Component

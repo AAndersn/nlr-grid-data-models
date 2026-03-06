@@ -2,7 +2,7 @@
 
 [![](../../models/DistributionFeeder.svg)](../../models/DistributionFeeder.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.components.DistributionFeeder
    :members: 
    :inherited-members: Component

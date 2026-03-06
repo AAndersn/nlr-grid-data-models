@@ -2,7 +2,7 @@
 
 [![](../../models/InverterController.svg)](../../models/InverterController.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.InverterController
    :members: __init__
    :inherited-members: Component
@@ -11,9 +11,9 @@
 
 ## Reactive Power Controls
 
-[![](../../models/PowerfactorControlSetting.svg)](../../models/PowerfactorControlSetting.svg
+[![](../../models/PowerfactorControlSetting.svg)](../../models/PowerfactorControlSetting.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.PowerfactorControlSetting
    :members: __init__
    :inherited-members: Component
@@ -22,7 +22,7 @@
 
 [![](../../models/VoltVarControlSetting.svg)](../../models/VoltVarControlSetting.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.VoltVarControlSetting
    :members: __init__
    :inherited-members: Component
@@ -33,7 +33,7 @@
 
 [![](../../models/VoltWattControlSetting.svg)](../../models/VoltWattControlSetting.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.VoltWattControlSetting
    :members: __init__
    :inherited-members: Component
@@ -42,7 +42,7 @@
 
 [![](../../models/PeakShavingBaseLoadingControlSetting.svg)](../../models/PeakShavingBaseLoadingControlSetting.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.PeakShavingBaseLoadingControlSetting
    :members: __init__
    :inherited-members: Component
@@ -51,7 +51,7 @@
 
 [![](../../models/CapacityFirmingControlSetting.svg)](../../models/CapacityFirmingControlSetting.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.CapacityFirmingControlSetting
    :members: __init__
    :inherited-members: Component
@@ -60,7 +60,7 @@
 
 [![](../../models/TimeBasedControlSetting.svg)](../../models/TimeBasedControlSetting.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.TimeBasedControlSetting
    :members: __init__
    :inherited-members: Component
@@ -69,7 +69,7 @@
 
 [![](../../models/SelfConsumptionControlSetting.svg)](../../models/SelfConsumptionControlSetting.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.SelfConsumptionControlSetting
    :members: __init__
    :inherited-members: Component
@@ -78,7 +78,7 @@
 
 [![](../../models/TimeOfUseControlSetting.svg)](../../models/TimeOfUseControlSetting.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.TimeOfUseControlSetting
    :members: __init__
    :inherited-members: Component
@@ -87,7 +87,7 @@
 
 [![](../../models/DemandChargeControlSetting.svg)](../../models/DemandChargeControlSetting.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.controllers.DemandChargeControlSetting
    :members: __init__
    :inherited-members: Component

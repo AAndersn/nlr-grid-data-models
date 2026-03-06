@@ -2,7 +2,7 @@
 
 [![](../../models/DistributionSolar.svg)](../../models/DistributionSolar.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.components.DistributionSolar
    :members: __init__
    :inherited-members: Component

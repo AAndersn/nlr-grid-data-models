@@ -2,7 +2,7 @@
 
 [![](../../models/DistributionSubstation.svg)](../../models/DistributionSubstation.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.components.DistributionSubstation
    :members: __init__
    :inherited-members: Component

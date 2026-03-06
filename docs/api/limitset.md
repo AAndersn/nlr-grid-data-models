@@ -2,7 +2,7 @@
 
 [![](../models/VoltageLimitSet.svg)](../models/VoltageLimitSet.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.common.VoltageLimitSet
    :members: __init__
    :inherited-members: Component
@@ -11,7 +11,7 @@
 
 [![](../models/ThermalLimitSet.svg)](../models/ThermalLimitSet.svg)
 
-```{eval-rst}
+```{code-block} rst
 .. autopydantic_model:: gdm.distribution.common.ThermalLimitSet
    :members: __init__
    :inherited-members: Component
