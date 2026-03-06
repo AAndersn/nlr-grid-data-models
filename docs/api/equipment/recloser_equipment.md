@@ -2,18 +2,15 @@
 
 [![](../../models/MatrixImpedanceRecloserEquipment.svg)](../../models/MatrixImpedanceRecloserEquipment.svg)
 
-```{code-block} rst
-.. autopydantic_model:: gdm.distribution.equipment.MatrixImpedanceRecloserEquipment
-   :members: __init__
-   :inherited-members: Component
-   :exclude-members: example, validate_fields
-```
+**API model:** `gdm.distribution.equipment.MatrixImpedanceRecloserEquipment`
+- Documented members: `__init__`
+- Inherited members: `Component`
+- Excluded members: `example, validate_fields`
+
 
 [![](../../models/RecloserControllerEquipment.svg)](../../models/RecloserControllerEquipment.svg)
 
-```{code-block} rst
-.. autopydantic_model:: gdm.distribution.equipment.RecloserControllerEquipment
-   :members: __init__
-   :inherited-members: Component
-   :exclude-members: example, validate_fields
-```
+**API model:** `gdm.distribution.equipment.RecloserControllerEquipment`
+- Documented members: `__init__`
+- Inherited members: `Component`
+- Excluded members: `example, validate_fields`

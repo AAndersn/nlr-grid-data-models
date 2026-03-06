@@ -2,9 +2,6 @@
 
 [![](../../models/DistributionBus.svg)](../../models/DistributionBus.svg)
 
-```{code-block} rst
-.. autopydantic_model:: gdm.distribution.components.DistributionBus
-   :members: 
-   :inherited-members: Component
-   :exclude-members: example, validate_fields
-```
+**API model:** `gdm.distribution.components.DistributionBus`
+- Documented members: `:inherited-members: Component`
+- Excluded members: `example, validate_fields`

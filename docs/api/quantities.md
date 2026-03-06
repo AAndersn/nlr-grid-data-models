@@ -1,8 +1,5 @@
 # Quantities
 
 
-```{code-block} rst
-.. automodule:: gdm.quantities
-    :members: 
-
-```
+**Module:** `gdm.quantities`
+- Documented members: `(all)`

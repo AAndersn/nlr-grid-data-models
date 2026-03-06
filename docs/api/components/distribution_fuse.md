@@ -2,9 +2,7 @@
 
 [![](../../models/MatrixImpedanceFuse.svg)](../../models/MatrixImpedanceFuse.svg)
 
-```{code-block} rst
-.. autopydantic_model:: gdm.distribution.components.MatrixImpedanceFuse
-   :members: __init__
-   :inherited-members: Component
-   :exclude-members: example, validate_fields
-```
+**API model:** `gdm.distribution.components.MatrixImpedanceFuse`
+- Documented members: `__init__`
+- Inherited members: `Component`
+- Excluded members: `example, validate_fields`

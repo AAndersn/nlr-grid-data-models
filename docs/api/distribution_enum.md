@@ -1,8 +1,5 @@
 # Distribution Enumerations
 
 
-```{code-block} rst
-.. automodule:: gdm.distribution
-    :members: Phase, ConnectionType, VoltageTypes, LimitType, BatteryState, ControllerSupport, ColorLineBy, ColorNodeBy
-
-```
+**Module:** `gdm.distribution`
+- Documented members: `Phase, ConnectionType, VoltageTypes, LimitType, BatteryState, ControllerSupport, ColorLineBy, ColorNodeBy`
