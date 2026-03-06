@@ -2,9 +2,8 @@
 
 [![](../../models/DistributionTransformer.svg)](../../models/DistributionTransformer.svg)
 
-```{code-block} rst
-.. autopydantic_model:: gdm.distribution.components.DistributionTransformer
-   :members: __init__
-   :inherited-members: Component
-   :exclude-members: example, validate_fields
-```
+**API model:** `gdm.distribution.components.DistributionTransformer`
+- Documented members: `__init__`
+- Inherited members: `Component`
+- Excluded members: `example, validate_fields`
+

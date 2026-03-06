@@ -2,18 +2,15 @@
 
 [![](../../models/PhaseVoltageSourceEquipment.svg)](../../models/PhaseVoltageSourceEquipment.svg)
 
-```{code-block} rst
-.. autopydantic_model:: gdm.distribution.equipment.PhaseVoltageSourceEquipment
-   :members: __init__
-   :inherited-members: Component
-   :exclude-members: example, validate_fields
-```
+**API model:** `gdm.distribution.equipment.PhaseVoltageSourceEquipment`
+- Documented members: `__init__`
+- Inherited members: `Component`
+- Excluded members: `example, validate_fields`
+
 
 [![](../../models/VoltageSourceEquipment.svg)](../../models/VoltageSourceEquipment.svg)
 
-```{code-block} rst
-.. autopydantic_model:: gdm.distribution.equipment.VoltageSourceEquipment
-   :members: __init__
-   :inherited-members: Component
-   :exclude-members: example, validate_fields
-```
+**API model:** `gdm.distribution.equipment.VoltageSourceEquipment`
+- Documented members: `__init__`
+- Inherited members: `Component`
+- Excluded members: `example, validate_fields`

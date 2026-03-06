@@ -2,18 +2,15 @@
 
 [![](../../models/BareConductorEquipment.svg)](../../models/BareConductorEquipment.svg) 
 
-```{code-block} rst
-.. autopydantic_model:: gdm.distribution.equipment.BareConductorEquipment
-   :members: __init__
-   :inherited-members: Component
-   :exclude-members: example, validate_fields
-```
+**API model:** `gdm.distribution.equipment.BareConductorEquipment`
+- Documented members: `__init__`
+- Inherited members: `Component`
+- Excluded members: `example, validate_fields`
+
 
 [![](../../models/ConcentricCableEquipment.svg)](../../models/ConcentricCableEquipment.svg) 
 
-```{code-block} rst
-.. autopydantic_model:: gdm.distribution.equipment.ConcentricCableEquipment
-   :members: __init__
-   :inherited-members: Component
-   :exclude-members: example, validate_fields
-```
+**API model:** `gdm.distribution.equipment.ConcentricCableEquipment`
+- Documented members: `__init__`
+- Inherited members: `Component`
+- Excluded members: `example, validate_fields`

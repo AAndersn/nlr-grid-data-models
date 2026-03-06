@@ -2,9 +2,8 @@
 
 [![](../../models/DistributionRecloserController.svg)](../../models/DistributionRecloserController.svg)
 
-```{code-block} rst
-.. autopydantic_model:: gdm.distribution.controllers.DistributionRecloserController
-   :members: __init__
-   :inherited-members: Component
-   :exclude-members: example, validate_fields
-```
+**API model:** `gdm.distribution.controllers.DistributionRecloserController`
+- Documented members: `__init__`
+- Inherited members: `Component`
+- Excluded members: `example, validate_fields`
+

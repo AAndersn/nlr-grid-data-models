@@ -3,19 +3,16 @@
 
 [![](../../models/WindingEquipment.svg)](../../models/WindingEquipment.svg) 
 
-```{code-block} rst
-.. autopydantic_model:: gdm.distribution.equipment.WindingEquipment
-   :members: __init__
-   :inherited-members: Component
-   :exclude-members: example, validate_fields
-```
+**API model:** `gdm.distribution.equipment.WindingEquipment`
+- Documented members: `__init__`
+- Inherited members: `Component`
+- Excluded members: `example, validate_fields`
+
 
 
 [![](../../models/DistributionTransformerEquipment.svg)](../../models/DistributionTransformerEquipment.svg) 
 
-```{code-block} rst
-.. autopydantic_model:: gdm.distribution.equipment.DistributionTransformerEquipment
-   :members: __init__
-   :inherited-members: Component
-   :exclude-members: example, validate_fields
-```
+**API model:** `gdm.distribution.equipment.DistributionTransformerEquipment`
+- Documented members: `__init__`
+- Inherited members: `Component`
+- Excluded members: `example, validate_fields`
