@@ -91,6 +91,82 @@ from gdm.quantities import (
 DEFAULT_DB_FORMAT_VERSION = "1"
 
 
+DISTRIBUTION_COMPONENT_TYPES = {
+    "distribution_feeders",
+    "distribution_substations",
+    "distribution_buses",
+    "voltage_limit_sets",
+    "distribution_loads",
+    "distribution_load_phases",
+    "load_equipment",
+    "load_equipment_phases",
+    "phase_load_equipment",
+    "distribution_solar",
+    "distribution_solar_phases",
+    "solar_equipment",
+    "inverter_equipment",
+    "inverter_controllers",
+    "inverter_active_power_controls",
+    "inverter_reactive_power_controls",
+    "curves",
+    "distribution_batteries",
+    "distribution_battery_phases",
+    "battery_equipment",
+    "distribution_capacitors",
+    "distribution_capacitor_phases",
+    "capacitor_controllers",
+    "capacitor_equipment",
+    "capacitor_equipment_phases",
+    "phase_capacitor_equipment",
+    "distribution_voltage_sources",
+    "distribution_voltage_source_phases",
+    "voltage_source_equipment",
+    "voltage_source_phases",
+    "phase_voltage_source_equipment",
+    "distribution_transformers",
+    "transformer_winding_buses",
+    "transformer_winding_phases",
+    "distribution_transformer_equipment",
+    "winding_equipment",
+    "winding_tap_positions",
+    "transformer_coupling_sequences",
+    "distribution_regulators",
+    "regulator_winding_buses",
+    "regulator_winding_phases",
+    "regulator_controllers",
+    "matrix_impedance_branches",
+    "matrix_impedance_branch_phases",
+    "matrix_impedance_branch_equipment",
+    "sequence_impedance_branches",
+    "sequence_impedance_branch_phases",
+    "sequence_impedance_branch_equipment",
+    "matrix_impedance_switches",
+    "matrix_impedance_switch_phases",
+    "switch_phase_states",
+    "matrix_impedance_switch_equipment",
+    "switch_controllers",
+    "matrix_impedance_fuses",
+    "matrix_impedance_fuse_phases",
+    "fuse_phase_states",
+    "matrix_impedance_fuse_equipment",
+    "matrix_impedance_reclosers",
+    "matrix_impedance_recloser_phases",
+    "recloser_phase_states",
+    "matrix_impedance_recloser_equipment",
+    "recloser_controllers",
+    "recloser_reclose_intervals",
+    "recloser_controller_equipment",
+    "time_current_curves",
+    "geometry_branches",
+    "geometry_branch_phases",
+    "geometry_branch_equipment",
+    "geometry_branch_conductors",
+    "bare_conductor_equipment",
+    "concentric_cable_equipment",
+    "impedance_matrix_entries",
+}
+
+
 def write_system_to_db(
     *,
     system,
@@ -390,110 +466,46 @@ def _write_distribution_buses(
             )
 
 
-def _write_distribution_topology(conn: sqlite3.Connection, system, replace: bool) -> None:
-    if not isinstance(system, DistributionSystem):
-        return
-
-    component_types = {
-        "distribution_feeders",
-        "distribution_substations",
-        "distribution_buses",
-        "voltage_limit_sets",
-        "distribution_loads",
-        "distribution_load_phases",
-        "load_equipment",
-        "load_equipment_phases",
-        "phase_load_equipment",
-        "distribution_solar",
-        "distribution_solar_phases",
-        "solar_equipment",
-        "inverter_equipment",
-        "inverter_controllers",
-        "inverter_active_power_controls",
-        "inverter_reactive_power_controls",
-        "curves",
-        "distribution_batteries",
-        "distribution_battery_phases",
-        "battery_equipment",
-        "distribution_capacitors",
-        "distribution_capacitor_phases",
-        "capacitor_controllers",
-        "capacitor_equipment",
-        "capacitor_equipment_phases",
-        "phase_capacitor_equipment",
-        "distribution_voltage_sources",
-        "distribution_voltage_source_phases",
-        "voltage_source_equipment",
-        "voltage_source_phases",
-        "phase_voltage_source_equipment",
-        "distribution_transformers",
-        "transformer_winding_buses",
-        "transformer_winding_phases",
-        "distribution_transformer_equipment",
-        "winding_equipment",
-        "winding_tap_positions",
-        "transformer_coupling_sequences",
-        "distribution_regulators",
-        "regulator_winding_buses",
-        "regulator_winding_phases",
-        "regulator_controllers",
-        "matrix_impedance_branches",
-        "matrix_impedance_branch_phases",
-        "matrix_impedance_branch_equipment",
-        "sequence_impedance_branches",
-        "sequence_impedance_branch_phases",
-        "sequence_impedance_branch_equipment",
-        "matrix_impedance_switches",
-        "matrix_impedance_switch_phases",
-        "switch_phase_states",
-        "matrix_impedance_switch_equipment",
-        "switch_controllers",
-        "matrix_impedance_fuses",
-        "matrix_impedance_fuse_phases",
-        "fuse_phase_states",
-        "matrix_impedance_fuse_equipment",
-        "matrix_impedance_reclosers",
-        "matrix_impedance_recloser_phases",
-        "recloser_phase_states",
-        "matrix_impedance_recloser_equipment",
-        "recloser_controllers",
-        "recloser_reclose_intervals",
-        "recloser_controller_equipment",
-        "time_current_curves",
-        "geometry_branches",
-        "geometry_branch_phases",
-        "geometry_branch_equipment",
-        "geometry_branch_conductors",
-        "bare_conductor_equipment",
-        "concentric_cable_equipment",
-        "impedance_matrix_entries",
-    }
-
-    if replace:
-        _delete_distribution_tables(conn, component_types)
-
-    feeder_id_by_name: dict[str, int] = {}
-    substation_id_by_name: dict[str, int] = {}
-
+def _collect_feeders_and_substations(
+    system: DistributionSystem,
+) -> tuple[dict[str, DistributionFeeder], dict[str, DistributionSubstation]]:
     feeders_by_name = {feeder.name: feeder for feeder in system.get_components(DistributionFeeder)}
     substations_by_name = {
         substation.name: substation for substation in system.get_components(DistributionSubstation)
     }
+
     for bus in system.get_components(DistributionBus):
         if bus.feeder is not None:
             feeders_by_name.setdefault(bus.feeder.name, bus.feeder)
         if bus.substation is not None:
             substations_by_name.setdefault(bus.substation.name, bus.substation)
+
     for substation in system.get_components(DistributionSubstation):
         for feeder in substation.feeders:
             feeders_by_name.setdefault(feeder.name, feeder)
 
+    return feeders_by_name, substations_by_name
+
+
+def _write_distribution_feeders(
+    conn: sqlite3.Connection,
+    feeders_by_name: dict[str, DistributionFeeder],
+) -> dict[str, int]:
+    feeder_id_by_name: dict[str, int] = {}
     for feeder in feeders_by_name.values():
         cursor = conn.execute("INSERT INTO distribution_feeders(name) VALUES(?)", (feeder.name,))
         feeder_id = int(cursor.lastrowid)
         feeder_id_by_name[feeder.name] = feeder_id
         _upsert_component_uuid_map(conn, "distribution_feeders", feeder_id, feeder.uuid)
+    return feeder_id_by_name
 
+
+def _write_distribution_substations(
+    conn: sqlite3.Connection,
+    substations_by_name: dict[str, DistributionSubstation],
+    feeder_id_by_name: dict[str, int],
+) -> dict[str, int]:
+    substation_id_by_name: dict[str, int] = {}
     for substation in substations_by_name.values():
         cursor = conn.execute(
             "INSERT INTO distribution_substations(name) VALUES(?)", (substation.name,)
@@ -519,8 +531,12 @@ def _write_distribution_topology(conn: sqlite3.Connection, system, replace: bool
                 (substation_id, feeder_id),
             )
 
-    _write_distribution_buses(conn, system, substation_id_by_name, feeder_id_by_name)
+    return substation_id_by_name
 
+
+def _write_distribution_asset_components(
+    conn: sqlite3.Connection, system: DistributionSystem
+) -> None:
     curve_id_by_uuid: dict[UUID, int] = {}
     active_control_id_by_uuid: dict[UUID, int] = {}
     reactive_control_id_by_uuid: dict[UUID, int] = {}
@@ -555,27 +571,29 @@ def _write_distribution_topology(conn: sqlite3.Connection, system, replace: bool
     _write_matrix_impedance_reclosers(conn, system)
 
 
-def _load_distribution_topology_from_normalized(
+def _write_distribution_topology(conn: sqlite3.Connection, system, replace: bool) -> None:
+    if not isinstance(system, DistributionSystem):
+        return
+    if replace:
+        _delete_distribution_tables(conn, DISTRIBUTION_COMPONENT_TYPES)
+
+    feeders_by_name, substations_by_name = _collect_feeders_and_substations(system)
+    feeder_id_by_name = _write_distribution_feeders(conn, feeders_by_name)
+    substation_id_by_name = _write_distribution_substations(
+        conn,
+        substations_by_name,
+        feeder_id_by_name,
+    )
+
+    _write_distribution_buses(conn, system, substation_id_by_name, feeder_id_by_name)
+    _write_distribution_asset_components(conn, system)
+
+
+def _load_distribution_feeders(
     conn: sqlite3.Connection,
-) -> DistributionSystem | None:
-    feeder_rows = conn.execute("SELECT id, name FROM distribution_feeders ORDER BY id").fetchall()
-    substation_rows = conn.execute(
-        "SELECT id, name FROM distribution_substations ORDER BY id"
-    ).fetchall()
-    bus_rows = conn.execute(
-        """
-        SELECT id, name, substation_id, feeder_id, voltage_type, rated_voltage,
-               rated_voltage_unit, coordinate_x, coordinate_y, in_service
-        FROM distribution_buses
-        ORDER BY id
-        """
-    ).fetchall()
-
-    if not feeder_rows and not substation_rows and not bus_rows:
-        return None
-
-    system = DistributionSystem(auto_add_composed_components=True)
-
+    system: DistributionSystem,
+    feeder_rows: list[tuple[int, str]],
+) -> dict[int, DistributionFeeder]:
     feeders_by_id: dict[int, DistributionFeeder] = {}
     for feeder_id, name in feeder_rows:
         feeder = DistributionFeeder(name=name)
@@ -584,7 +602,15 @@ def _load_distribution_topology_from_normalized(
             feeder = feeder.model_copy(update={"uuid": feeder_uuid})
         system.add_component(feeder)
         feeders_by_id[feeder_id] = feeder
+    return feeders_by_id
 
+
+def _load_distribution_substations(
+    conn: sqlite3.Connection,
+    system: DistributionSystem,
+    substation_rows: list[tuple[int, str]],
+    feeders_by_id: dict[int, DistributionFeeder],
+) -> dict[int, DistributionSubstation]:
     substation_to_feeders = conn.execute(
         "SELECT substation_id, feeder_id FROM substation_feeders ORDER BY substation_id, feeder_id"
     ).fetchall()
@@ -602,6 +628,43 @@ def _load_distribution_topology_from_normalized(
         system.add_component(substation)
         substations_by_id[substation_id] = substation
 
+    return substations_by_id
+
+
+def _load_bus_voltage_limits(conn: sqlite3.Connection, bus_id: int) -> list[VoltageLimitSet]:
+    limit_rows = conn.execute(
+        """
+        SELECT v.id, v.name, v.limit_type, v.value, v.value_unit
+        FROM bus_voltage_limits bvl
+        JOIN voltage_limit_sets v ON v.id = bvl.limit_set_id
+        WHERE bvl.bus_id = ?
+        ORDER BY v.id
+        """,
+        (bus_id,),
+    ).fetchall()
+
+    voltage_limits: list[VoltageLimitSet] = []
+    for limit_id, limit_name, limit_type, limit_value, limit_unit in limit_rows:
+        limit_set = VoltageLimitSet(
+            name=limit_name,
+            limit_type=LimitType(limit_type),
+            value=Voltage(limit_value, limit_unit),
+        )
+        limit_uuid = _fetch_component_uuid(conn, "voltage_limit_sets", limit_id)
+        if limit_uuid is not None:
+            limit_set = limit_set.model_copy(update={"uuid": limit_uuid})
+        voltage_limits.append(limit_set)
+
+    return voltage_limits
+
+
+def _load_distribution_buses(
+    conn: sqlite3.Connection,
+    system: DistributionSystem,
+    bus_rows: list[tuple],
+    substations_by_id: dict[int, DistributionSubstation],
+    feeders_by_id: dict[int, DistributionFeeder],
+) -> dict[int, DistributionBus]:
     buses_by_id: dict[int, DistributionBus] = {}
 
     for (
@@ -621,28 +684,7 @@ def _load_distribution_topology_from_normalized(
             (bus_id,),
         ).fetchall()
         phases = [Phase(phase) for (phase,) in phase_rows]
-
-        limit_rows = conn.execute(
-            """
-            SELECT v.id, v.name, v.limit_type, v.value, v.value_unit
-            FROM bus_voltage_limits bvl
-            JOIN voltage_limit_sets v ON v.id = bvl.limit_set_id
-            WHERE bvl.bus_id = ?
-            ORDER BY v.id
-            """,
-            (bus_id,),
-        ).fetchall()
-        voltage_limits: list[VoltageLimitSet] = []
-        for limit_id, limit_name, limit_type, limit_value, limit_unit in limit_rows:
-            limit_set = VoltageLimitSet(
-                name=limit_name,
-                limit_type=LimitType(limit_type),
-                value=Voltage(limit_value, limit_unit),
-            )
-            limit_uuid = _fetch_component_uuid(conn, "voltage_limit_sets", limit_id)
-            if limit_uuid is not None:
-                limit_set = limit_set.model_copy(update={"uuid": limit_uuid})
-            voltage_limits.append(limit_set)
+        voltage_limits = _load_bus_voltage_limits(conn, bus_id)
 
         coordinate = None
         if coordinate_x is not None and coordinate_y is not None:
@@ -664,6 +706,41 @@ def _load_distribution_topology_from_normalized(
             bus = bus.model_copy(update={"uuid": bus_uuid})
         system.add_component(bus)
         buses_by_id[bus_id] = bus
+
+    return buses_by_id
+
+
+def _load_distribution_topology_from_normalized(
+    conn: sqlite3.Connection,
+) -> DistributionSystem | None:
+    feeder_rows = conn.execute("SELECT id, name FROM distribution_feeders ORDER BY id").fetchall()
+    substation_rows = conn.execute(
+        "SELECT id, name FROM distribution_substations ORDER BY id"
+    ).fetchall()
+    bus_rows = conn.execute(
+        """
+        SELECT id, name, substation_id, feeder_id, voltage_type, rated_voltage,
+               rated_voltage_unit, coordinate_x, coordinate_y, in_service
+        FROM distribution_buses
+        ORDER BY id
+        """
+    ).fetchall()
+
+    if not feeder_rows and not substation_rows and not bus_rows:
+        return None
+
+    system = DistributionSystem(auto_add_composed_components=True)
+    feeders_by_id = _load_distribution_feeders(conn, system, feeder_rows)
+    substations_by_id = _load_distribution_substations(
+        conn, system, substation_rows, feeders_by_id
+    )
+    buses_by_id = _load_distribution_buses(
+        conn,
+        system,
+        bus_rows,
+        substations_by_id,
+        feeders_by_id,
+    )
 
     _load_distribution_loads_from_normalized(
         conn,
