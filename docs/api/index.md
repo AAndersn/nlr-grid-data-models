@@ -1,5 +1,9 @@
 # API Reference
 
+For full auto-generated Python API documentation, see the dedicated Sphinx API site:
+
+- [Python API (Sphinx)](/grid-data-models/python-api/index.html)
+
 ## Distribution Components
 
 - [Distribution Battery](components/distribution_battery.md)
