@@ -36,6 +36,11 @@ jobs:
           jupyter-book clean --html --temp --logs -y
           jupyter-book build --html
 
+      - name: Build dedicated Sphinx API docs
+        run: |
+          python -m sphinx.ext.apidoc -o docs/api_sphinx/generated src/gdm --force --separate --module-first
+          python -m sphinx -b html docs/api_sphinx docs/_build/html/python-api
+
       - name: Deploy to GitHub Pages
         run: |
           ghp-import -n -p -f docs/_build/html
