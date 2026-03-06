@@ -755,32 +755,7 @@ def _write_distribution_regulators(conn: sqlite3.Connection, system: Distributio
     transformer_equipment_id_by_name: dict[str, int] = {}
 
     for regulator in system.get_components(DistributionRegulator):
-        regulator_substation = regulator.substation
-        regulator_feeder = regulator.feeder
-        if (regulator_substation is None or regulator_feeder is None) and regulator.buses:
-            fallback_bus = regulator.buses[0]
-            regulator_substation = regulator_substation or fallback_bus.substation
-            regulator_feeder = regulator_feeder or fallback_bus.feeder
-        if regulator_substation is None or regulator_feeder is None:
-            raise ValueError(
-                f"DistributionRegulator '{regulator.name}' must have substation and feeder"
-            )
-
-        substation_row = conn.execute(
-            "SELECT id FROM distribution_substations WHERE name = ?",
-            (regulator_substation.name,),
-        ).fetchone()
-        feeder_row = conn.execute(
-            "SELECT id FROM distribution_feeders WHERE name = ?",
-            (regulator_feeder.name,),
-        ).fetchone()
-        if substation_row is None or feeder_row is None:
-            raise ValueError(
-                f"DistributionRegulator '{regulator.name}' references missing substation/feeder"
-            )
-        substation_id = int(substation_row[0])
-        feeder_id = int(feeder_row[0])
-
+        substation_id, feeder_id = _resolve_regulator_location_ids(conn, regulator)
         equipment_id = _upsert_distribution_transformer_equipment(
             conn,
             regulator.equipment,
@@ -807,104 +782,155 @@ def _write_distribution_regulators(conn: sqlite3.Connection, system: Distributio
         )
         regulator_id = int(cursor.lastrowid)
         _upsert_component_uuid_map(conn, "distribution_regulators", regulator_id, regulator.uuid)
+        _write_regulator_winding_buses(conn, regulator_id, regulator, bus_id_by_name)
+        _write_regulator_winding_phases(conn, regulator_id, regulator)
+        _write_regulator_controllers(conn, regulator_id, regulator, bus_id_by_name)
 
-        for winding_index, bus in enumerate(regulator.buses):
-            bus_id = bus_id_by_name.get(bus.name)
-            if bus_id is None:
-                raise ValueError(
-                    f"DistributionRegulator '{regulator.name}' references unknown bus '{bus.name}'"
-                )
+
+def _resolve_regulator_location_ids(
+    conn: sqlite3.Connection,
+    regulator: DistributionRegulator,
+) -> tuple[int, int]:
+    regulator_substation = regulator.substation
+    regulator_feeder = regulator.feeder
+    if (regulator_substation is None or regulator_feeder is None) and regulator.buses:
+        fallback_bus = regulator.buses[0]
+        regulator_substation = regulator_substation or fallback_bus.substation
+        regulator_feeder = regulator_feeder or fallback_bus.feeder
+
+    if regulator_substation is None or regulator_feeder is None:
+        raise ValueError(
+            f"DistributionRegulator '{regulator.name}' must have substation and feeder"
+        )
+
+    substation_row = conn.execute(
+        "SELECT id FROM distribution_substations WHERE name = ?",
+        (regulator_substation.name,),
+    ).fetchone()
+    feeder_row = conn.execute(
+        "SELECT id FROM distribution_feeders WHERE name = ?",
+        (regulator_feeder.name,),
+    ).fetchone()
+    if substation_row is None or feeder_row is None:
+        raise ValueError(
+            f"DistributionRegulator '{regulator.name}' references missing substation/feeder"
+        )
+
+    return int(substation_row[0]), int(feeder_row[0])
+
+
+def _write_regulator_winding_buses(
+    conn: sqlite3.Connection,
+    regulator_id: int,
+    regulator: DistributionRegulator,
+    bus_id_by_name: dict[str, int],
+) -> None:
+    for winding_index, bus in enumerate(regulator.buses):
+        bus_id = bus_id_by_name.get(bus.name)
+        if bus_id is None:
+            raise ValueError(
+                f"DistributionRegulator '{regulator.name}' references unknown bus '{bus.name}'"
+            )
+        conn.execute(
+            "INSERT INTO regulator_winding_buses(regulator_id, winding_index, bus_id) VALUES(?, ?, ?)",
+            (regulator_id, winding_index, bus_id),
+        )
+
+
+def _write_regulator_winding_phases(
+    conn: sqlite3.Connection,
+    regulator_id: int,
+    regulator: DistributionRegulator,
+) -> None:
+    for winding_index, phases in enumerate(regulator.winding_phases):
+        for phase_index, phase in enumerate(phases):
             conn.execute(
-                "INSERT INTO regulator_winding_buses(regulator_id, winding_index, bus_id) VALUES(?, ?, ?)",
-                (regulator_id, winding_index, bus_id),
-            )
-
-        for winding_index, phases in enumerate(regulator.winding_phases):
-            for phase_index, phase in enumerate(phases):
-                conn.execute(
-                    """
-                    INSERT INTO regulator_winding_phases(
-                        regulator_id,
-                        winding_index,
-                        phase,
-                        phase_index
-                    ) VALUES(?, ?, ?, ?)
-                    """,
-                    (regulator_id, winding_index, phase.value, phase_index),
-                )
-
-        for position_index, controller in enumerate(regulator.controllers):
-            controlled_bus_id = bus_id_by_name.get(controller.controlled_bus.name)
-            if controlled_bus_id is None:
-                raise ValueError(
-                    f"RegulatorController '{controller.name}' references unknown bus '{controller.controlled_bus.name}'"
-                )
-            cursor = conn.execute(
                 """
-                INSERT INTO regulator_controllers(
+                INSERT INTO regulator_winding_phases(
                     regulator_id,
-                    position_index,
-                    name,
-                    delay,
-                    delay_unit,
-                    v_setpoint,
-                    v_setpoint_unit,
-                    min_v_limit,
-                    min_v_limit_unit,
-                    max_v_limit,
-                    max_v_limit_unit,
-                    pt_ratio,
-                    use_ldc,
-                    is_reversible,
-                    ldc_R,
-                    ldc_R_unit,
-                    ldc_X,
-                    ldc_X_unit,
-                    ct_primary,
-                    ct_primary_unit,
-                    max_step,
-                    bandwidth,
-                    bandwidth_unit,
-                    controlled_bus_id,
-                    controlled_phase
-                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    winding_index,
+                    phase,
+                    phase_index
+                ) VALUES(?, ?, ?, ?)
                 """,
-                (
-                    regulator_id,
-                    position_index,
-                    controller.name,
-                    float(controller.delay.magnitude) if controller.delay is not None else None,
-                    str(controller.delay.units) if controller.delay is not None else None,
-                    float(controller.v_setpoint.magnitude),
-                    str(controller.v_setpoint.units),
-                    float(controller.min_v_limit.magnitude),
-                    str(controller.min_v_limit.units),
-                    float(controller.max_v_limit.magnitude),
-                    str(controller.max_v_limit.units),
-                    controller.pt_ratio,
-                    1 if controller.use_ldc else 0,
-                    1 if controller.is_reversible else 0,
-                    float(controller.ldc_R.magnitude) if controller.ldc_R is not None else None,
-                    str(controller.ldc_R.units) if controller.ldc_R is not None else None,
-                    float(controller.ldc_X.magnitude) if controller.ldc_X is not None else None,
-                    str(controller.ldc_X.units) if controller.ldc_X is not None else None,
-                    float(controller.ct_primary.magnitude)
-                    if controller.ct_primary is not None
-                    else None,
-                    str(controller.ct_primary.units)
-                    if controller.ct_primary is not None
-                    else None,
-                    controller.max_step,
-                    float(controller.bandwidth.magnitude),
-                    str(controller.bandwidth.units),
-                    controlled_bus_id,
-                    controller.controlled_phase.value,
-                ),
+                (regulator_id, winding_index, phase.value, phase_index),
             )
-            controller_id = int(cursor.lastrowid)
-            _upsert_component_uuid_map(
-                conn, "regulator_controllers", controller_id, controller.uuid
+
+
+def _write_regulator_controllers(
+    conn: sqlite3.Connection,
+    regulator_id: int,
+    regulator: DistributionRegulator,
+    bus_id_by_name: dict[str, int],
+) -> None:
+    for position_index, controller in enumerate(regulator.controllers):
+        controlled_bus_id = bus_id_by_name.get(controller.controlled_bus.name)
+        if controlled_bus_id is None:
+            raise ValueError(
+                f"RegulatorController '{controller.name}' references unknown bus '{controller.controlled_bus.name}'"
             )
+        cursor = conn.execute(
+            """
+            INSERT INTO regulator_controllers(
+                regulator_id,
+                position_index,
+                name,
+                delay,
+                delay_unit,
+                v_setpoint,
+                v_setpoint_unit,
+                min_v_limit,
+                min_v_limit_unit,
+                max_v_limit,
+                max_v_limit_unit,
+                pt_ratio,
+                use_ldc,
+                is_reversible,
+                ldc_R,
+                ldc_R_unit,
+                ldc_X,
+                ldc_X_unit,
+                ct_primary,
+                ct_primary_unit,
+                max_step,
+                bandwidth,
+                bandwidth_unit,
+                controlled_bus_id,
+                controlled_phase
+            ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                regulator_id,
+                position_index,
+                controller.name,
+                float(controller.delay.magnitude) if controller.delay is not None else None,
+                str(controller.delay.units) if controller.delay is not None else None,
+                float(controller.v_setpoint.magnitude),
+                str(controller.v_setpoint.units),
+                float(controller.min_v_limit.magnitude),
+                str(controller.min_v_limit.units),
+                float(controller.max_v_limit.magnitude),
+                str(controller.max_v_limit.units),
+                controller.pt_ratio,
+                1 if controller.use_ldc else 0,
+                1 if controller.is_reversible else 0,
+                float(controller.ldc_R.magnitude) if controller.ldc_R is not None else None,
+                str(controller.ldc_R.units) if controller.ldc_R is not None else None,
+                float(controller.ldc_X.magnitude) if controller.ldc_X is not None else None,
+                str(controller.ldc_X.units) if controller.ldc_X is not None else None,
+                float(controller.ct_primary.magnitude)
+                if controller.ct_primary is not None
+                else None,
+                str(controller.ct_primary.units) if controller.ct_primary is not None else None,
+                controller.max_step,
+                float(controller.bandwidth.magnitude),
+                str(controller.bandwidth.units),
+                controlled_bus_id,
+                controller.controlled_phase.value,
+            ),
+        )
+        controller_id = int(cursor.lastrowid)
+        _upsert_component_uuid_map(conn, "regulator_controllers", controller_id, controller.uuid)
 
 
 def _load_or_cache_capacitor_equipment(
@@ -1242,102 +1268,12 @@ def _load_distribution_voltage_sources_from_normalized(
         source_equipment_id,
         in_service,
     ) in vsource_rows:
-        source_equipment = source_equipment_cache.get(source_equipment_id)
-        if source_equipment is None:
-            equipment_row = conn.execute(
-                "SELECT name FROM voltage_source_equipment WHERE id = ?",
-                (source_equipment_id,),
-            ).fetchone()
-            if equipment_row is None:
-                raise ValueError(f"voltage_source_equipment_id={source_equipment_id} not found")
-            (equipment_name,) = equipment_row
-
-            phase_links = conn.execute(
-                """
-                SELECT phase_source_equipment_id
-                FROM voltage_source_phases
-                WHERE voltage_source_equipment_id = ?
-                ORDER BY position_index
-                """,
-                (source_equipment_id,),
-            ).fetchall()
-            sources: list[PhaseVoltageSourceEquipment] = []
-            for (phase_source_id,) in phase_links:
-                phase_source = phase_source_cache.get(phase_source_id)
-                if phase_source is None:
-                    source_row = conn.execute(
-                        """
-                        SELECT
-                            name,
-                            r0,
-                            r0_unit,
-                            r1,
-                            r1_unit,
-                            x0,
-                            x0_unit,
-                            x1,
-                            x1_unit,
-                            voltage,
-                            voltage_unit,
-                            voltage_type,
-                            angle,
-                            angle_unit
-                        FROM phase_voltage_source_equipment
-                        WHERE id = ?
-                        """,
-                        (phase_source_id,),
-                    ).fetchone()
-                    if source_row is None:
-                        raise ValueError(
-                            f"phase_voltage_source_equipment_id={phase_source_id} not found"
-                        )
-                    (
-                        phase_name,
-                        r0,
-                        r0_unit,
-                        r1,
-                        r1_unit,
-                        x0,
-                        x0_unit,
-                        x1,
-                        x1_unit,
-                        voltage,
-                        voltage_unit,
-                        voltage_type,
-                        angle,
-                        angle_unit,
-                    ) = source_row
-                    phase_source = PhaseVoltageSourceEquipment(
-                        name=phase_name,
-                        r0=Resistance(r0, r0_unit),
-                        r1=Resistance(r1, r1_unit),
-                        x0=Reactance(x0, x0_unit),
-                        x1=Reactance(x1, x1_unit),
-                        voltage=Voltage(voltage, voltage_unit),
-                        voltage_type=VoltageTypes(voltage_type),
-                        angle=Angle(angle, angle_unit),
-                    )
-                    phase_source_uuid = _fetch_component_uuid(
-                        conn,
-                        "phase_voltage_source_equipment",
-                        phase_source_id,
-                    )
-                    if phase_source_uuid is not None:
-                        phase_source = phase_source.model_copy(update={"uuid": phase_source_uuid})
-                    phase_source_cache[phase_source_id] = phase_source
-                sources.append(phase_source)
-
-            source_equipment = VoltageSourceEquipment(name=equipment_name, sources=sources)
-            source_equipment_uuid = _fetch_component_uuid(
-                conn,
-                "voltage_source_equipment",
-                source_equipment_id,
-            )
-            if source_equipment_uuid is not None:
-                source_equipment = source_equipment.model_copy(
-                    update={"uuid": source_equipment_uuid}
-                )
-            source_equipment_cache[source_equipment_id] = source_equipment
+        source_equipment = _load_or_cache_voltage_source_equipment(
+            conn,
+            source_equipment_id,
+            source_equipment_cache,
+            phase_source_cache,
+        )
 
         phase_rows = conn.execute(
             "SELECT phase FROM distribution_voltage_source_phases WHERE vsource_id = ? ORDER BY position_index",
@@ -1358,6 +1294,119 @@ def _load_distribution_voltage_sources_from_normalized(
         if vsource_uuid is not None:
             vsource = vsource.model_copy(update={"uuid": vsource_uuid})
         system.add_component(vsource)
+
+
+def _load_or_cache_phase_voltage_source_equipment(
+    conn: sqlite3.Connection,
+    phase_source_id: int,
+    phase_source_cache: dict[int, PhaseVoltageSourceEquipment],
+) -> PhaseVoltageSourceEquipment:
+    phase_source = phase_source_cache.get(phase_source_id)
+    if phase_source is not None:
+        return phase_source
+
+    source_row = conn.execute(
+        """
+        SELECT
+            name,
+            r0,
+            r0_unit,
+            r1,
+            r1_unit,
+            x0,
+            x0_unit,
+            x1,
+            x1_unit,
+            voltage,
+            voltage_unit,
+            voltage_type,
+            angle,
+            angle_unit
+        FROM phase_voltage_source_equipment
+        WHERE id = ?
+        """,
+        (phase_source_id,),
+    ).fetchone()
+    if source_row is None:
+        raise ValueError(f"phase_voltage_source_equipment_id={phase_source_id} not found")
+
+    (
+        phase_name,
+        r0,
+        r0_unit,
+        r1,
+        r1_unit,
+        x0,
+        x0_unit,
+        x1,
+        x1_unit,
+        voltage,
+        voltage_unit,
+        voltage_type,
+        angle,
+        angle_unit,
+    ) = source_row
+    phase_source = PhaseVoltageSourceEquipment(
+        name=phase_name,
+        r0=Resistance(r0, r0_unit),
+        r1=Resistance(r1, r1_unit),
+        x0=Reactance(x0, x0_unit),
+        x1=Reactance(x1, x1_unit),
+        voltage=Voltage(voltage, voltage_unit),
+        voltage_type=VoltageTypes(voltage_type),
+        angle=Angle(angle, angle_unit),
+    )
+    phase_source_uuid = _fetch_component_uuid(
+        conn, "phase_voltage_source_equipment", phase_source_id
+    )
+    if phase_source_uuid is not None:
+        phase_source = phase_source.model_copy(update={"uuid": phase_source_uuid})
+
+    phase_source_cache[phase_source_id] = phase_source
+    return phase_source
+
+
+def _load_or_cache_voltage_source_equipment(
+    conn: sqlite3.Connection,
+    source_equipment_id: int,
+    source_equipment_cache: dict[int, VoltageSourceEquipment],
+    phase_source_cache: dict[int, PhaseVoltageSourceEquipment],
+) -> VoltageSourceEquipment:
+    source_equipment = source_equipment_cache.get(source_equipment_id)
+    if source_equipment is not None:
+        return source_equipment
+
+    equipment_row = conn.execute(
+        "SELECT name FROM voltage_source_equipment WHERE id = ?",
+        (source_equipment_id,),
+    ).fetchone()
+    if equipment_row is None:
+        raise ValueError(f"voltage_source_equipment_id={source_equipment_id} not found")
+    (equipment_name,) = equipment_row
+
+    phase_links = conn.execute(
+        """
+        SELECT phase_source_equipment_id
+        FROM voltage_source_phases
+        WHERE voltage_source_equipment_id = ?
+        ORDER BY position_index
+        """,
+        (source_equipment_id,),
+    ).fetchall()
+    sources = [
+        _load_or_cache_phase_voltage_source_equipment(conn, phase_source_id, phase_source_cache)
+        for (phase_source_id,) in phase_links
+    ]
+
+    source_equipment = VoltageSourceEquipment(name=equipment_name, sources=sources)
+    source_equipment_uuid = _fetch_component_uuid(
+        conn, "voltage_source_equipment", source_equipment_id
+    )
+    if source_equipment_uuid is not None:
+        source_equipment = source_equipment.model_copy(update={"uuid": source_equipment_uuid})
+
+    source_equipment_cache[source_equipment_id] = source_equipment
+    return source_equipment
 
 
 def _load_distribution_transformers_from_normalized(
