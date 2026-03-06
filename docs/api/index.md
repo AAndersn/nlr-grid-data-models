@@ -1,59 +1,47 @@
 # API Reference
 
-```{toctree}
-:caption: Distribution Components
-:hidden: true
+## Distribution Components
 
-components/distribution_battery
-components/distribution_bus
-components/distribution_branch
-components/distribution_capacitor
-components/distribution_feeder
-components/distribution_substation
-components/distribution_load
-components/distribution_transformer
-components/distribution_regulator
-components/distribution_fuse
-components/distribution_switch
-components/distribution_recloser
-components/distribution_vsource
-components/distribution_solar
-```
+- [Distribution Battery](components/distribution_battery.md)
+- [Distribution Bus](components/distribution_bus.md)
+- [Distribution Branch](components/distribution_branch.md)
+- [Distribution Capacitor](components/distribution_capacitor.md)
+- [Distribution Feeder](components/distribution_feeder.md)
+- [Distribution Substation](components/distribution_substation.md)
+- [Distribution Load](components/distribution_load.md)
+- [Distribution Transformer](components/distribution_transformer.md)
+- [Distribution Regulator](components/distribution_regulator.md)
+- [Distribution Fuse](components/distribution_fuse.md)
+- [Distribution Switch](components/distribution_switch.md)
+- [Distribution Recloser](components/distribution_recloser.md)
+- [Distribution Voltage Source](components/distribution_vsource.md)
+- [Distribution Solar](components/distribution_solar.md)
 
-```{toctree}
-:caption: Distribution Equipment
-:hidden: true
+## Distribution Equipment
 
-equipment/battery_equipment
-equipment/branch_equipment
-equipment/capacitor_equipment
-equipment/load_equipment
-equipment/distribution_transformer_equipment
-equipment/vsource_equipment
-equipment/distribution_wires
-equipment/fuse_equipment
-equipment/switch_equipment
-equipment/recloser_equipment
-equipment/solar_equipment
-equipment/inverter_equipment
-```
+- [Battery Equipment](equipment/battery_equipment.md)
+- [Branch Equipment](equipment/branch_equipment.md)
+- [Capacitor Equipment](equipment/capacitor_equipment.md)
+- [Load Equipment](equipment/load_equipment.md)
+- [Distribution Transformer Equipment](equipment/distribution_transformer_equipment.md)
+- [Voltage Source Equipment](equipment/vsource_equipment.md)
+- [Distribution Wires](equipment/distribution_wires.md)
+- [Fuse Equipment](equipment/fuse_equipment.md)
+- [Switch Equipment](equipment/switch_equipment.md)
+- [Recloser Equipment](equipment/recloser_equipment.md)
+- [Solar Equipment](equipment/solar_equipment.md)
+- [Inverter Equipment](equipment/inverter_equipment.md)
 
-```{toctree}
-:caption: Controllers
-:hidden: true
+## Controllers
 
-controllers/capacitor_controllers
-controllers/regulator_controllers
-controllers/inverter_controllers
-controllers/switch_controllers
-controllers/recloser_controllers
-```
+- [Capacitor Controllers](controllers/capacitor_controllers.md)
+- [Regulator Controllers](controllers/regulator_controllers.md)
+- [Inverter Controllers](controllers/inverter_controllers.md)
+- [Switch Controllers](controllers/switch_controllers.md)
+- [Recloser Controllers](controllers/recloser_controllers.md)
 
-```{toctree}
-:caption: Extra Models
-:hidden: true
+## Extra Models
 
-distribution_enum
-limitset
-quantities
-```
+- [Distribution Enum](distribution_enum.md)
+- [Limit Set](limitset.md)
+- [Quantities](quantities.md)
