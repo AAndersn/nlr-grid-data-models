@@ -1,0 +1,48 @@
+version: 1
+project:
+  title: Grid-Data-Models
+  authors:
+    - name: Aadil Latif
+  github: NLR-Distribution-Suite/grid-data-models
+  bibliography:
+    - references.bib
+  exports:
+    - format: pdf
+      template: plain_latex_book
+      output: exports/book.pdf
+  toc:
+    - file: intro.md
+    - title: Installation
+      children:
+        - file: installation.ipynb
+        - file: gdmloader/gdmloader.ipynb
+    - title: Tutorial
+      children:
+        - file: new_features.ipynb
+        - file: gdm_intro/data_models.ipynb
+        - file: gdm_intro/units.ipynb
+        - file: gdm_intro/timeseries.ipynb
+        - file: dist_system/import_export.ipynb
+        - file: dist_system/plotting.ipynb
+    - title: Advanced Usage
+      children:
+        - file: dist_system/graphs.ipynb
+        - file: dist_system/network_reduction.ipynb
+        - file: dist_system/tracked_changes.ipynb
+    - title: On CIM and GDM
+      children:
+        - file: cim/index.md
+        - file: cim/distribution-bus.md
+    - title: MCP Server
+      children:
+        - file: mcp/MCP_README.md
+        - file: mcp/VSCODE_SETUP.md
+    - title: Reference Guides
+      children:
+        - file: api/index.md
+        - file: cli/index.md
+site:
+  options:
+    logo: gdm_logo.jpeg
+    folders: true
+  template: book-theme

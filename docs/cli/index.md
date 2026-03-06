@@ -11,11 +11,4 @@ gdm --help
 
 | Command |  Description |
 | --------| -------------|
-| [reduce](#reduce) | Performs distribution network reduction |
-
-```{toctree}
-:caption: Commands
-:hidden: true
-
-reduce
-```
+| [reduce](reduce.md) | Performs distribution network reduction |

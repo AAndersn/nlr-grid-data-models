@@ -25,12 +25,15 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install graphviz pygraphviz 
           python -m pip install ".[doc]"
-          pip install jupyter-book~=1.0 ghp-import matplotlib gdmloader
+          pip install ghp-import matplotlib gdmloader
 
       - name: Build the book
+        working-directory: docs
+        env:
+          NODE_TLS_REJECT_UNAUTHORIZED: "0"
         run: |
-          jupyter-book clean docs
-          jupyter-book build docs
+          jupyter-book clean --html --temp --logs -y
+          jupyter-book build --html
 
       - name: Deploy to GitHub Pages
         run: |
