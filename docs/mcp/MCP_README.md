@@ -82,7 +82,7 @@ Alternatively, you should see **Start** code lenses directly in the `mcp.json` f
 
 1. Open Copilot Chat (`Cmd+Shift+I` / `Ctrl+Shift+I`)
 2. Switch to **Agent** mode using the dropdown at the top of the chat panel
-3. Click the **Tools** icon (wrench) in the chat input area to verify the server's 20 tools are listed and enabled
+3. Click the **Tools** icon (wrench) in the chat input area to verify the server's 22 tools are listed and enabled
 4. Ask questions naturally — the agent automatically selects the right tools:
    - *"Get a summary of the system in /path/to/model.json"*
    - *"Diagnose validation errors in system.json and suggest fixes"*
@@ -107,7 +107,7 @@ MCP servers are also supported in Claude Desktop. Add to your Claude Desktop con
 }
 ```
 
-Restart Claude Desktop and the assistant will have access to all 20 GDM tools.
+Restart Claude Desktop and the assistant will have access to all 22 GDM tools.
 
 ### Starting the MCP Server Standalone
 
@@ -125,7 +125,96 @@ gdm-mcp-server --host localhost --port 8000
 
 ### Using with Other MCP Clients
 
-Any MCP-compatible client can connect to the server. The server exposes 20 tools for working with distribution power system models.
+Any MCP-compatible client can connect to the server. The server exposes 22 tools for working with distribution power system models.
+
+## Runtime Tool Toggle
+
+The server supports runtime enable/disable for non-control tool calls. This is useful when you want a UI switch (or policy gate) without restarting the server.
+
+- `set_tool_calls_enabled` toggles non-control tools on/off.
+- `get_tool_calls_enabled` returns current toggle state.
+- Control tools remain callable even when all other tools are disabled.
+
+Example payloads:
+
+```json
+{"enabled": false}
+```
+
+```json
+{"enabled": true}
+```
+
+You can also set the startup default from CLI:
+
+```bash
+gdm-mcp-server --tool-calls-disabled
+```
+
+```bash
+gdm-mcp-server --tool-calls-enabled
+```
+
+## model_ref Interoperability
+
+Path-based tools now support either legacy `system_path` or a `model_ref`
+object, enabling compatibility with persisted model registries.
+
+### model_ref shape
+
+```json
+{
+  "model_id": "abc123def456",
+  "version": 2
+}
+```
+
+Direct path-carrying references are also valid:
+
+```json
+{
+  "stored_path": "/abs/path/to/system.json"
+}
+```
+
+### Resolution behavior
+
+Resolution order:
+
+1. `stored_path`
+2. `path`
+3. `source_path`
+4. Registry lookup by `model_id` / `version`
+
+Registry lookup uses:
+
+- `model_ref.registry_db` if provided
+- otherwise environment variable `DIST_STACK_MODEL_REGISTRY_DB`
+
+### Backward compatibility
+
+Existing clients using `system_path` continue to work unchanged.
+
+### Example payloads
+
+Legacy:
+
+```json
+{
+  "system_path": "/abs/path/to/system.json"
+}
+```
+
+Registry-backed:
+
+```json
+{
+  "model_ref": {
+    "model_id": "abc123def456",
+    "version": 2
+  }
+}
+```
 
 ## Available Tools
 
@@ -158,6 +247,10 @@ Any MCP-compatible client can connect to the server. The server exposes 20 tools
 - `get_code_examples` — Get code examples for specific topics
 - `list_available_components` — List all available distribution component types
 - `get_component_fields` — Get detailed field information for a component type
+
+### Server Control (2 tools)
+- `set_tool_calls_enabled` — Enable or disable non-control tool calls at runtime
+- `get_tool_calls_enabled` — Get current tool-call enablement state
 
 ## Example Usage
 

@@ -4,7 +4,7 @@ from pydantic import Field, model_validator
 from typing import List, Optional
 from infrasys import Component
 
-from gdm.distribution.enums import BillingDemandBasis, CustomerClass, TOUPeriodType, Season
+from gdm.distribution.enums import BillingDemandBasis, CustomerClass, Month, TOUPeriodType
 
 
 class TOURatePeriod(Component):
@@ -50,13 +50,13 @@ class DemandCharge(Component):
 
 class SeasonalTOURates(Component):
     name: str = ""
-    season: Season = Field(..., description="Season for the TOU rates")
-    tou_periods: List[TOURatePeriod] = Field(..., description="List of TOU periods for the season")
+    season: Month = Field(..., description="Month for the TOU rates")
+    tou_periods: List[TOURatePeriod] = Field(..., description="List of TOU periods for the month")
 
     @classmethod
     def example(cls) -> "SeasonalTOURates":
         return SeasonalTOURates(
-            season=Season.SUMMER,
+            season=Month.JULY,
             tou_periods=[
                 TOURatePeriod.example(),
                 TOURatePeriod(
@@ -114,7 +114,7 @@ class DistributionTariff(Component):
             seasonal_tou=[
                 SeasonalTOURates.example(),
                 SeasonalTOURates(
-                    season=Season.WINTER,
+                    season=Month.JANUARY,
                     tou_periods=[
                         TOURatePeriod.example(),
                         TOURatePeriod(
