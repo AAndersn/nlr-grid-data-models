@@ -152,6 +152,39 @@ def _get_system_paths_arg(args: dict[str, Any]) -> list[str]:
     raise ValueError("Expected either 'system_paths' or 'model_refs'")
 
 
+def _split_tool_input_schema() -> dict[str, Any]:
+    """Build shared input schema for split tools."""
+    return {
+        "type": "object",
+        "properties": {
+            "system_path": {
+                "type": "string",
+                "description": "Path to the distribution system JSON file",
+            },
+            "model_ref": {
+                "type": "object",
+                "description": "Model reference object with path or registry lookup metadata",
+            },
+            "output_dir": {
+                "type": "string",
+                "description": "Directory to save the split systems",
+            },
+            "keep_timeseries": {
+                "type": "boolean",
+                "description": "Preserve time series data (default: true)",
+                "default": True,
+            },
+            "include_unassigned": {
+                "type": "boolean",
+                "description": "Create system for unassigned components (default: true)",
+                "default": True,
+            },
+        },
+        "required": ["output_dir"],
+        "anyOf": [{"required": ["system_path"]}, {"required": ["model_ref"]}],
+    }
+
+
 @app.list_tools()
 async def list_tools() -> list[Tool]:
     """List all available MCP tools."""
@@ -259,68 +292,12 @@ async def list_tools() -> list[Tool]:
         Tool(
             name="split_by_substation",
             description="Split a distribution system into separate systems for each substation.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "system_path": {
-                        "type": "string",
-                        "description": "Path to the distribution system JSON file",
-                    },
-                    "model_ref": {
-                        "type": "object",
-                        "description": "Model reference object with path or registry lookup metadata",
-                    },
-                    "output_dir": {
-                        "type": "string",
-                        "description": "Directory to save the split systems",
-                    },
-                    "keep_timeseries": {
-                        "type": "boolean",
-                        "description": "Preserve time series data (default: true)",
-                        "default": True,
-                    },
-                    "include_unassigned": {
-                        "type": "boolean",
-                        "description": "Create system for unassigned components (default: true)",
-                        "default": True,
-                    },
-                },
-                "required": ["output_dir"],
-                "anyOf": [{"required": ["system_path"]}, {"required": ["model_ref"]}],
-            },
+            inputSchema=_split_tool_input_schema(),
         ),
         Tool(
             name="split_by_feeder",
             description="Split a distribution system into separate systems for each feeder.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "system_path": {
-                        "type": "string",
-                        "description": "Path to the distribution system JSON file",
-                    },
-                    "model_ref": {
-                        "type": "object",
-                        "description": "Model reference object with path or registry lookup metadata",
-                    },
-                    "output_dir": {
-                        "type": "string",
-                        "description": "Directory to save the split systems",
-                    },
-                    "keep_timeseries": {
-                        "type": "boolean",
-                        "description": "Preserve time series data (default: true)",
-                        "default": True,
-                    },
-                    "include_unassigned": {
-                        "type": "boolean",
-                        "description": "Create system for unassigned components (default: true)",
-                        "default": True,
-                    },
-                },
-                "required": ["output_dir"],
-                "anyOf": [{"required": ["system_path"]}, {"required": ["model_ref"]}],
-            },
+            inputSchema=_split_tool_input_schema(),
         ),
         Tool(
             name="reduce_system",
