@@ -15,13 +15,13 @@ Options:
   -f, --force                  Force delete the target GDM system file if
                                already exists.
   -r, --reducer [three_phase]  Reducer type to apply.  [default: three_phase]
-  -ts, --timeseries            Include timeseries data in the reduced system.
+  -ts, --time-series            Include time series data in the reduced system.
   --install-completion         Install completion for the current shell.
   --show-completion            Show completion for the current shell.
   --help                       Show this message and exit.
 ```
 
-Following command converts `test.json` to `test_reduced.json` including timeseries data.
+Following command converts `test.json` to `test_reduced.json` including time series data.
 
 ```bash
 gdm reduce -g 'test.json' -t 'test_reduced.json' -r "three_phase" -ts

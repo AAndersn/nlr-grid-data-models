@@ -21,7 +21,7 @@ project:
         - file: new_features.ipynb
         - file: gdm_intro/data_models.ipynb
         - file: gdm_intro/units.ipynb
-        - file: gdm_intro/timeseries.ipynb
+        - file: gdm_intro/time_series.ipynb
         - file: dist_system/import_export.ipynb
         - file: dist_system/plotting.ipynb
     - title: Advanced Usage

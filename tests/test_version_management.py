@@ -11,8 +11,8 @@ def fix_version(version):
     return version
 
 
-def test_version_control(tmp_path, distribution_system_with_single_timeseries):
-    system: DistributionSystem = distribution_system_with_single_timeseries
+def test_version_control(tmp_path, distribution_system_with_single_time_series):
+    system: DistributionSystem = distribution_system_with_single_time_series
     assert fix_version(system.data_format_version) == fix_version(gdm.version.VERSION)
     system.to_json(tmp_path / "model.json")
     with open(tmp_path / "model.json", "r") as f:
