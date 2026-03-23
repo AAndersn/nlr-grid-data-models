@@ -6,9 +6,7 @@ grid-data-models functionality as tools for AI agents.
 
 import json
 import logging
-import os
 from pathlib import Path
-import sqlite3
 from typing import Annotated, Any
 
 import typer
@@ -57,6 +55,39 @@ app = Server("grid-data-models-mcp")
 # Runtime toggle for serving tool calls. Control tools remain available.
 _TOOL_CALLS_ENABLED = True
 _CONTROL_TOOLS = {"set_tool_calls_enabled", "get_tool_calls_enabled"}
+
+
+def _load_system_with_fallback_name(system_path: str) -> DistributionSystem:
+    """Load a distribution system and ensure it has a non-empty name.
+
+    Some cached models have null/blank top-level names, which can break MCP response
+    schemas that require string fields. We normalize that case to the file stem so
+    summary/diagnostics tools stay usable.
+    """
+    path = Path(system_path)
+    system = DistributionSystem.from_json(system_path)
+
+    if not isinstance(system.name, str) or not system.name.strip():
+        system.name = path.stem
+
+    return system
+
+
+def _get_system_path_arg(args: dict[str, Any]) -> str:
+    """Extract system path from legacy system_path or model_ref input."""
+    if isinstance(args.get("system_path"), str) and args["system_path"].strip():
+        return str(args["system_path"])
+
+    raise ValueError("Expected 'system_path' argument")
+
+
+def _get_system_paths_arg(args: dict[str, Any]) -> list[str]:
+    """Extract list of system paths from system_paths or model_refs."""
+    system_paths = args.get("system_paths")
+    if isinstance(system_paths, list) and system_paths:
+        return [str(path) for path in system_paths]
+
+    raise ValueError("Expected 'system_paths' argument")
 
 
 @app.list_tools()
@@ -198,44 +229,6 @@ async def list_tools() -> list[Tool]:
                     },
                 },
                 "required": ["system_path", "output_dir"],
-            },
-        ),
-        Tool(
-            name="reduce_system",
-            description="Reduce a distribution system model (supports three-phase and primary reduction).",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "system_path": {
-                        "type": "string",
-                        "description": "Path to the distribution system JSON file",
-                    },
-                    "output_path": {
-                        "type": "string",
-                        "description": "Path to save the reduced system JSON file",
-                    },
-                    "reducer": {
-                        "type": "string",
-                        "description": "Reducer type to apply",
-                        "enum": ["three_phase", "primary"],
-                        "default": "three_phase",
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "Optional name for reduced system",
-                    },
-                    "keep_timeseries": {
-                        "type": "boolean",
-                        "description": "Include/aggregate time series in reduced system (default: false)",
-                        "default": False,
-                    },
-                    "overwrite": {
-                        "type": "boolean",
-                        "description": "Overwrite output file if it exists (default: false)",
-                        "default": False,
-                    },
-                },
-                "required": ["system_path", "output_path"],
             },
         ),
         # Inspection tools
@@ -418,33 +411,6 @@ async def list_tools() -> list[Tool]:
                 "required": ["system_path"],
             },
         ),
-        Tool(
-            name="save_system",
-            description="Save a distribution system JSON to a target path using DistributionSystem.to_json.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "system_path": {
-                        "type": "string",
-                        "description": "Path to source distribution system JSON file",
-                    },
-                    "output_path": {
-                        "type": "string",
-                        "description": "Path to write output distribution system JSON file",
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "Optional system name override before saving",
-                    },
-                    "overwrite": {
-                        "type": "boolean",
-                        "description": "Overwrite output file if it exists (default: false)",
-                        "default": False,
-                    },
-                },
-                "required": ["system_path", "output_path"],
-            },
-        ),
         # Documentation/Knowledge tools
         Tool(
             name="search_gdm_documentation",
@@ -515,28 +481,6 @@ async def list_tools() -> list[Tool]:
                 "required": ["component_name"],
             },
         ),
-        Tool(
-            name="set_tool_calls_enabled",
-            description="Enable or disable non-control MCP tool calls at runtime.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "enabled": {
-                        "type": "boolean",
-                        "description": "Whether normal tool calls should be enabled",
-                    }
-                },
-                "required": ["enabled"],
-            },
-        ),
-        Tool(
-            name="get_tool_calls_enabled",
-            description="Get current runtime state for MCP tool-call enablement.",
-            inputSchema={
-                "type": "object",
-                "properties": {},
-            },
-        ),
     ]
 
 
@@ -548,7 +492,6 @@ _TOOL_HANDLERS: dict[str, Any] = {
     "merge_systems": lambda args: _merge_systems(args),
     "split_by_substation": lambda args: _split_by_substation(args),
     "split_by_feeder": lambda args: _split_by_feeder(args),
-    "reduce_system": lambda args: _reduce_system(args),
     "get_system_summary": lambda args: _get_system_summary(args),
     "query_components": lambda args: _query_components(args),
     "analyze_topology": lambda args: _analyze_topology(args),
@@ -558,108 +501,12 @@ _TOOL_HANDLERS: dict[str, Any] = {
     "get_component_relationships": lambda args: _get_component_relationships(args),
     "export_subsystem_by_buses": lambda args: _export_subsystem_by_buses(args),
     "get_time_series_summary": lambda args: _get_time_series_summary(args),
-    "save_system": lambda args: _save_system(args),
     "search_gdm_documentation": lambda args: _search_gdm_documentation(args),
     "get_api_reference": lambda args: _get_api_reference(args),
     "get_code_examples": lambda args: _get_code_examples(args),
     "list_available_components": lambda args: _list_available_components(args),
     "get_component_fields": lambda args: _get_component_fields(args),
-    "set_tool_calls_enabled": lambda args: _set_tool_calls_enabled(args),
-    "get_tool_calls_enabled": lambda args: _get_tool_calls_enabled(args),
 }
-
-
-def _load_system_with_fallback_name(system_path: str) -> DistributionSystem:
-    """Load a distribution system and ensure it has a non-empty name.
-
-    Some cached models have null/blank top-level names, which can break MCP response
-    schemas that require string fields. We normalize that case to the file stem so
-    summary/diagnostics tools stay usable.
-    """
-    path = Path(system_path)
-    system = DistributionSystem.from_json(system_path)
-
-    if not isinstance(system.name, str) or not system.name.strip():
-        system.name = path.stem
-
-    return system
-
-
-def _resolve_model_ref_to_path(model_ref: dict[str, Any]) -> str:
-    """Resolve a model_ref payload to a concrete system JSON path.
-
-    Supports direct path-carrying refs and dist_stack model registry lookup via
-    ``DIST_STACK_MODEL_REGISTRY_DB``.
-    """
-    for key in ("stored_path", "path", "source_path"):
-        value = model_ref.get(key)
-        if isinstance(value, str) and value.strip():
-            return value
-
-    model_id = model_ref.get("model_id")
-    if not isinstance(model_id, str) or not model_id.strip():
-        raise ValueError("model_ref must include a path or model_id")
-
-    version = model_ref.get("version")
-    db_path = model_ref.get("registry_db") or os.getenv("DIST_STACK_MODEL_REGISTRY_DB")
-    if not db_path:
-        raise ValueError(
-            "model_ref requires DIST_STACK_MODEL_REGISTRY_DB (or model_ref.registry_db) "
-            "when path fields are not provided"
-        )
-
-    with sqlite3.connect(str(db_path)) as conn:
-        conn.row_factory = sqlite3.Row
-        if version is None:
-            row = conn.execute(
-                """
-                SELECT stored_path FROM models
-                WHERE model_id = ?
-                ORDER BY version DESC
-                LIMIT 1
-                """,
-                (model_id,),
-            ).fetchone()
-        else:
-            row = conn.execute(
-                """
-                SELECT stored_path FROM models
-                WHERE model_id = ? AND version = ?
-                LIMIT 1
-                """,
-                (model_id, int(version)),
-            ).fetchone()
-
-    if row is None:
-        suffix = "latest" if version is None else f"version={version}"
-        raise ValueError(f"model_ref not found for model_id={model_id}, {suffix}")
-
-    return str(row["stored_path"])
-
-
-def _get_system_path_arg(args: dict[str, Any]) -> str:
-    """Extract system path from legacy system_path or model_ref input."""
-    if isinstance(args.get("system_path"), str) and args["system_path"].strip():
-        return str(args["system_path"])
-
-    model_ref = args.get("model_ref")
-    if isinstance(model_ref, dict):
-        return _resolve_model_ref_to_path(model_ref)
-
-    raise ValueError("Expected either 'system_path' or 'model_ref'")
-
-
-def _get_system_paths_arg(args: dict[str, Any]) -> list[str]:
-    """Extract list of system paths from system_paths or model_refs."""
-    system_paths = args.get("system_paths")
-    if isinstance(system_paths, list) and system_paths:
-        return [str(path) for path in system_paths]
-
-    model_refs = args.get("model_refs")
-    if isinstance(model_refs, list) and model_refs:
-        return [_resolve_model_ref_to_path(ref) for ref in model_refs if isinstance(ref, dict)]
-
-    raise ValueError("Expected either 'system_paths' or 'model_refs'")
 
 
 @app.call_tool()
@@ -667,22 +514,6 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
     """Handle tool calls from MCP clients."""
     try:
         logger.info(f"Tool called: {name} with arguments: {arguments}")
-
-        if not _TOOL_CALLS_ENABLED and name not in _CONTROL_TOOLS:
-            return [
-                TextContent(
-                    type="text",
-                    text=json.dumps(
-                        {
-                            "error": (
-                                "Tool calls are currently disabled. "
-                                "Use set_tool_calls_enabled to re-enable."
-                            )
-                        },
-                        indent=2,
-                    ),
-                )
-            ]
 
         handler = _TOOL_HANDLERS.get(name)
         if handler is not None:
@@ -707,16 +538,16 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
 # Tool implementations
 async def _diagnose_system(args: dict) -> dict:
     """Diagnose system validation errors."""
-    system_path = _get_system_path_arg(args)
-    system = _load_system_with_fallback_name(system_path)
+    system_path = args["system_path"]
+    system = DistributionSystem.from_json(system_path)
     report = diagnose_system(system)
     return report.model_dump()
 
 
 async def _suggest_fixes(args: dict) -> dict:
     """Suggest fixes for validation errors."""
-    system_path = _get_system_path_arg(args)
-    system = _load_system_with_fallback_name(system_path)
+    system_path = args["system_path"]
+    system = DistributionSystem.from_json(system_path)
     report = diagnose_system(system)
     suggestions = suggest_fixes(report)
     return {
@@ -727,11 +558,11 @@ async def _suggest_fixes(args: dict) -> dict:
 
 async def _apply_fixes(args: dict) -> dict:
     """Apply fixes to a system."""
-    system_path = _get_system_path_arg(args)
+    system_path = args["system_path"]
     output_path = args["output_path"]
     auto_approve = args.get("auto_approve", False)
 
-    system = _load_system_with_fallback_name(system_path)
+    system = DistributionSystem.from_json(system_path)
     report = diagnose_system(system)
     suggestions = suggest_fixes(report)
 
@@ -748,12 +579,12 @@ async def _apply_fixes(args: dict) -> dict:
 
 async def _merge_systems(args: dict) -> dict:
     """Merge multiple systems."""
-    system_paths = _get_system_paths_arg(args)
+    system_paths = args["system_paths"]
     output_path = args["output_path"]
     name = args["name"]
     strict = args.get("strict", True)
 
-    systems = [_load_system_with_fallback_name(path) for path in system_paths]
+    systems = [DistributionSystem.from_json(path) for path in system_paths]
     merged_system, report = merge_systems(systems, name, strict)
 
     # Save merged system
@@ -767,12 +598,12 @@ async def _merge_systems(args: dict) -> dict:
 
 async def _split_by_substation(args: dict) -> dict:
     """Split system by substation."""
-    system_path = _get_system_path_arg(args)
+    system_path = args["system_path"]
     output_dir = args["output_dir"]
     keep_timeseries = args.get("keep_timeseries", True)
     include_unassigned = args.get("include_unassigned", True)
 
-    system = _load_system_with_fallback_name(system_path)
+    system = DistributionSystem.from_json(system_path)
     subsystems, report = split_by_substation(system, keep_timeseries, include_unassigned)
 
     # Save subsystems
@@ -793,12 +624,12 @@ async def _split_by_substation(args: dict) -> dict:
 
 async def _split_by_feeder(args: dict) -> dict:
     """Split system by feeder."""
-    system_path = _get_system_path_arg(args)
+    system_path = args["system_path"]
     output_dir = args["output_dir"]
     keep_timeseries = args.get("keep_timeseries", True)
     include_unassigned = args.get("include_unassigned", True)
 
-    system = _load_system_with_fallback_name(system_path)
+    system = DistributionSystem.from_json(system_path)
     subsystems, report = split_by_feeder(system, keep_timeseries, include_unassigned)
 
     # Save subsystems
@@ -817,53 +648,18 @@ async def _split_by_feeder(args: dict) -> dict:
     }
 
 
-async def _reduce_system(args: dict) -> dict:
-    """Reduce a distribution system model."""
-    system_path = _get_system_path_arg(args)
-    output_path = args["output_path"]
-    reducer = args.get("reducer", "three_phase")
-    keep_timeseries = args.get("keep_timeseries", False)
-    overwrite = args.get("overwrite", False)
-
-    output_file = Path(output_path)
-    if output_file.exists() and not overwrite:
-        raise ValueError(
-            f"Output file already exists: {output_path}. Set overwrite=true to replace."
-        )
-
-    system = _load_system_with_fallback_name(system_path)
-    reduced_name = args.get("name") or f"{system.name}_reduced"
-
-    reducer_func = {
-        "three_phase": reduce_to_three_phase_system,
-        "primary": reduce_to_primary_system,
-    }
-    if reducer not in reducer_func:
-        raise ValueError(f"Unsupported reducer: {reducer}")
-
-    reduced_system = reducer_func[reducer](system, reduced_name, keep_timeseries)
-    reduced_system.to_json(output_path, overwrite=overwrite)
-
-    summary = get_system_summary(reduced_system)
-    return {
-        "output_path": output_path,
-        "reducer": reducer,
-        "summary": summary.model_dump(),
-    }
-
-
 async def _get_system_summary(args: dict) -> dict:
     """Get system summary."""
-    system_path = _get_system_path_arg(args)
-    system = _load_system_with_fallback_name(system_path)
+    system_path = args["system_path"]
+    system = DistributionSystem.from_json(system_path)
     summary = get_system_summary(system)
     return summary.model_dump()
 
 
 async def _query_components(args: dict) -> dict:
     """Query components with filters."""
-    system_path = _get_system_path_arg(args)
-    system = _load_system_with_fallback_name(system_path)
+    system_path = args["system_path"]
+    system = DistributionSystem.from_json(system_path)
 
     filters = ComponentFilter(
         component_types=args.get("component_types"),
@@ -880,40 +676,40 @@ async def _query_components(args: dict) -> dict:
 
 async def _analyze_topology(args: dict) -> dict:
     """Analyze topology."""
-    system_path = _get_system_path_arg(args)
-    system = _load_system_with_fallback_name(system_path)
+    system_path = args["system_path"]
+    system = DistributionSystem.from_json(system_path)
     metrics = analyze_topology(system)
     return metrics.model_dump()
 
 
 async def _validate_connectivity(args: dict) -> dict:
     """Validate connectivity."""
-    system_path = _get_system_path_arg(args)
-    system = _load_system_with_fallback_name(system_path)
+    system_path = args["system_path"]
+    system = DistributionSystem.from_json(system_path)
     return validate_connectivity(system)
 
 
 async def _get_component_details(args: dict) -> dict:
     """Get component details."""
-    system_path = _get_system_path_arg(args)
+    system_path = args["system_path"]
     identifier = args["identifier"]
-    system = _load_system_with_fallback_name(system_path)
+    system = DistributionSystem.from_json(system_path)
     return get_component_details(system, identifier)
 
 
 async def _find_orphaned_components(args: dict) -> dict:
     """Find orphaned components."""
-    system_path = _get_system_path_arg(args)
-    system = _load_system_with_fallback_name(system_path)
+    system_path = args["system_path"]
+    system = DistributionSystem.from_json(system_path)
     orphaned = find_orphaned_components(system)
     return {"orphaned_components": [c.model_dump() for c in orphaned], "count": len(orphaned)}
 
 
 async def _get_component_relationships(args: dict) -> dict:
     """Get component relationships."""
-    system_path = _get_system_path_arg(args)
+    system_path = args["system_path"]
     component_id = args["component_id"]
-    system = _load_system_with_fallback_name(system_path)
+    system = DistributionSystem.from_json(system_path)
     relationships = get_component_relationships(system, component_id)
     return {
         "parents": [p.model_dump() for p in relationships.get("parents", [])],
@@ -923,13 +719,13 @@ async def _get_component_relationships(args: dict) -> dict:
 
 async def _export_subsystem_by_buses(args: dict) -> dict:
     """Export subsystem by buses."""
-    system_path = _get_system_path_arg(args)
+    system_path = args["system_path"]
     bus_names = args["bus_names"]
     output_path = args["output_path"]
     name = args["name"]
     keep_timeseries = args.get("keep_timeseries", True)
 
-    system = _load_system_with_fallback_name(system_path)
+    system = DistributionSystem.from_json(system_path)
     subsystem = export_subsystem_by_buses(system, bus_names, name, keep_timeseries)
 
     # Save subsystem
@@ -944,32 +740,9 @@ async def _export_subsystem_by_buses(args: dict) -> dict:
 
 async def _get_time_series_summary(args: dict) -> dict:
     """Get time series summary."""
-    system_path = _get_system_path_arg(args)
-    system = _load_system_with_fallback_name(system_path)
+    system_path = args["system_path"]
+    system = DistributionSystem.from_json(system_path)
     return get_time_series_summary(system)
-
-
-async def _save_system(args: dict) -> dict:
-    """Save a distribution system JSON to a target path."""
-    system_path = _get_system_path_arg(args)
-    output_path = args["output_path"]
-    overwrite = args.get("overwrite", False)
-
-    output_file = Path(output_path)
-    if output_file.exists() and not overwrite:
-        raise ValueError(
-            f"Output file already exists: {output_path}. Set overwrite=true to replace."
-        )
-
-    system = _load_system_with_fallback_name(system_path)
-    if args.get("name") is not None:
-        system.name = args["name"]
-
-    system.to_json(output_path, overwrite=overwrite)
-    return {
-        "output_path": output_path,
-        "name": system.name,
-    }
 
 
 # Documentation/Knowledge handlers
@@ -1009,26 +782,6 @@ async def _get_component_fields(args: dict) -> dict:
     return {"component_name": component_name, "fields": fields}
 
 
-async def _set_tool_calls_enabled(args: dict) -> dict:
-    """Set runtime MCP tool-call enablement state."""
-    global _TOOL_CALLS_ENABLED
-
-    _TOOL_CALLS_ENABLED = bool(args["enabled"])
-    return {
-        "tool_calls_enabled": _TOOL_CALLS_ENABLED,
-        "message": (
-            "Non-control tool calls are enabled"
-            if _TOOL_CALLS_ENABLED
-            else "Non-control tool calls are disabled"
-        ),
-    }
-
-
-async def _get_tool_calls_enabled(args: dict) -> dict:
-    """Get runtime MCP tool-call enablement state."""
-    return {"tool_calls_enabled": _TOOL_CALLS_ENABLED}
-
-
 def _run_server(
     host: Annotated[str, typer.Option(help="Server host")] = "localhost",
     port: Annotated[int, typer.Option(help="Server port")] = 8000,
@@ -1036,13 +789,6 @@ def _run_server(
     allow_auto_fix: Annotated[
         bool, typer.Option("--allow-auto-fix", help="Allow auto-fix operations")
     ] = False,
-    tool_calls_enabled: Annotated[
-        bool,
-        typer.Option(
-            "--tool-calls-enabled/--tool-calls-disabled",
-            help="Start server with non-control tool calls enabled or disabled.",
-        ),
-    ] = True,
 ):
     """Start the GDM MCP server."""
     # Set log level
@@ -1051,10 +797,6 @@ def _run_server(
     logger.info(f"Starting GDM MCP Server v{__version__}")
     logger.info(f"Host: {host}, Port: {port}")
     logger.info(f"Auto-fix allowed: {allow_auto_fix}")
-    logger.info(f"Tool calls enabled: {tool_calls_enabled}")
-
-    global _TOOL_CALLS_ENABLED
-    _TOOL_CALLS_ENABLED = tool_calls_enabled
 
     # Run the server
     import asyncio
@@ -1064,6 +806,41 @@ def _run_server(
             await app.run(read_stream, write_stream, app.create_initialization_options())
 
     asyncio.run(run())
+
+
+async def _reduce_system(args: dict) -> dict:
+    """Reduce a distribution system model."""
+    system_path = _get_system_path_arg(args)
+    output_path = args["output_path"]
+    reducer = args.get("reducer", "three_phase")
+    keep_timeseries = args.get("keep_timeseries", False)
+    overwrite = args.get("overwrite", False)
+
+    output_file = Path(output_path)
+    if output_file.exists() and not overwrite:
+        raise ValueError(
+            f"Output file already exists: {output_path}. Set overwrite=true to replace."
+        )
+
+    system = _load_system_with_fallback_name(system_path)
+    reduced_name = args.get("name") or f"{system.name}_reduced"
+
+    reducer_func = {
+        "three_phase": reduce_to_three_phase_system,
+        "primary": reduce_to_primary_system,
+    }
+    if reducer not in reducer_func:
+        raise ValueError(f"Unsupported reducer: {reducer}")
+
+    reduced_system = reducer_func[reducer](system, reduced_name, keep_timeseries)
+    reduced_system.to_json(output_path, overwrite=overwrite)
+
+    summary = get_system_summary(reduced_system)
+    return {
+        "output_path": output_path,
+        "reducer": reducer,
+        "summary": summary.model_dump(),
+    }
 
 
 def main():
