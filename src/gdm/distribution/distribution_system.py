@@ -278,6 +278,7 @@ class DistributionSystem(System):
         name: str,
         keep_timeseries: bool = False,
         time_series_type: Type[TimeSeriesData] = SingleTimeSeries,
+        directed_graph: nx.DiGraph | None = None,
     ) -> "DistributionSystem":
         """Method to get subsystem from list of buses.
 
@@ -291,11 +292,14 @@ class DistributionSystem(System):
             Set this flag to retain timeseries data associated with the component.
         time_series_type: Type[TimeSeriesData]
             Type of time series data. Defaults to: SingleTimeSeries
+        directed_graph: nx.DiGraph | None
+            Optional precomputed directed graph for this system. When provided,
+            it is reused instead of rebuilding the directed graph.
         Returns
         -------
         DistributionSystem
         """
-        tree = self.get_directed_graph()
+        tree = directed_graph if directed_graph is not None else self.get_directed_graph()
         subtree = tree.subgraph(bus_names)
         subtree_system = DistributionSystem(auto_add_composed_components=True, name=name)
         for u, v, _ in subtree.edges(data=True):
@@ -479,7 +483,10 @@ class DistributionSystem(System):
                         break
         return list(set(switch_buses))
 
-    def get_split_phase_mapping(self) -> dict[str, set[Phase]]:
+    def get_split_phase_mapping(
+        self,
+        directed_graph: nx.DiGraph | None = None,
+    ) -> dict[str, set[Phase]]:
         """Generates a mapping of components to their split-phase configurations.
 
         This method identifies distribution transformers with center-tapped windings and
@@ -493,6 +500,12 @@ class DistributionSystem(System):
             A dictionary where keys are component names and values are sets of phases
             associated with the high-voltage bus.
 
+        Parameters
+        ----------
+        directed_graph: nx.DiGraph | None
+            Optional precomputed directed graph for this system. When provided,
+            it is reused instead of rebuilding the directed graph.
+
         Notes
         -----
         - The method uses the directed graph representation of the distribution system to
@@ -504,7 +517,7 @@ class DistributionSystem(System):
         - Logs the process of identifying and mapping split-phase transformers.
         """
         split_phase_map = {}
-        original_tree = self.get_directed_graph()
+        original_tree = directed_graph if directed_graph is not None else self.get_directed_graph()
         split_phase_trs: list[DistributionTransformer] = list(
             self.get_components(
                 DistributionTransformer,
@@ -517,7 +530,9 @@ class DistributionSystem(System):
             }.pop()
             hv_bus = (set([bus.name for bus in tr.buses]) - set([lv_bus])).pop()
             lv_system = self.get_subsystem(
-                list(nx.descendants(original_tree, lv_bus)) + [lv_bus], name=""
+                list(nx.descendants(original_tree, lv_bus)) + [lv_bus],
+                name="",
+                directed_graph=original_tree,
             )
             bus_model_types = self.get_model_types_with_field_type(DistributionBus)
             for model_type in bus_model_types:

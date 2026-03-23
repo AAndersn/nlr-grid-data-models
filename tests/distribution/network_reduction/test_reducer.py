@@ -1,5 +1,7 @@
+from collections import Counter
 from datetime import timedelta, datetime
 import pytest
+from loguru import logger
 
 from infrasys.time_series_models import SingleTimeSeries, NonSequentialTimeSeries
 
@@ -312,3 +314,30 @@ def test_reduce_to_primary_system(distribution_system_with_single_timeseries):
 
     assert get_total_kvar(reducer_total_load) == get_total_kvar(gdm_total_load), f"""Reactive power Reduced: {get_total_kvar(reducer_total_load)} Mvar,
         Original: {get_total_kvar(gdm_total_load)} Mvar"""
+
+
+def test_reduce_to_primary_system_does_not_repeat_graph_logs(simple_distribution_system):
+    gdm_sys: DistributionSystem = simple_distribution_system
+    captured_messages: list[str] = []
+    sink_id = logger.add(lambda message: captured_messages.append(message.record["message"]))
+
+    try:
+        reduce_to_primary_system(gdm_sys, name="reduced_system", agg_timeseries=False)
+    finally:
+        logger.remove(sink_id)
+
+    repeated_counts = Counter(captured_messages)
+    repeated_graph_messages = {
+        msg: count
+        for msg, count in repeated_counts.items()
+        if count > 1
+        and (
+            msg.startswith("Creating directed graph with source bus ->")
+            or msg.startswith("The following buses have phases not connected to any component:")
+        )
+    }
+
+    assert not repeated_graph_messages, (
+        "Reducer should not repeatedly emit identical graph-construction warnings in a single "
+        f"reduction run. Repeated messages: {repeated_graph_messages}"
+    )

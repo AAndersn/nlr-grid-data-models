@@ -54,13 +54,22 @@ class PhaseCapacitorEquipment(Component):
     def aggregate(
         cls, instances: list["PhaseCapacitorEquipment"], name: str
     ) -> "PhaseCapacitorEquipment":
+        resistance_inverse_sum = sum(
+            1 / inst.resistance for inst in instances if inst.resistance.magnitude
+        )
+        reactance_inverse_sum = sum(
+            1 / inst.reactance for inst in instances if inst.reactance.magnitude
+        )
+
         return PhaseCapacitorEquipment(
             name=name,
             rated_reactive_power=sum(inst.rated_reactive_power for inst in instances),
-            resistance=1
-            / sum(1 / inst.resistance if inst.resistance.magnitude else 0 for inst in instances),
-            reactance=1
-            / sum(1 / inst.reactance if inst.reactance.magnitude else 0 for inst in instances),
+            resistance=(
+                1 / resistance_inverse_sum if resistance_inverse_sum else Resistance(0, "ohm")
+            ),
+            reactance=(
+                1 / reactance_inverse_sum if reactance_inverse_sum else Reactance(0, "ohm")
+            ),
             num_banks=sum(inst.num_banks for inst in instances),
             num_banks_on=sum(inst.num_banks_on for inst in instances),
         )
