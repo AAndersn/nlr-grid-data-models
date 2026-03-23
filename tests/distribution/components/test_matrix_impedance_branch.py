@@ -122,19 +122,3 @@ def test_branch_phase_count_matches_one_bus_valid():
         equipment=_two_phase_equipment(),
     )
     assert len(branch.phases) == 2
-
-
-def test_branch_phase_count_matches_no_bus_invalid():
-    """Branch phase count differing from every connected bus must be rejected."""
-    bus1 = _make_bus("bus-abc-1", [Phase.A, Phase.B, Phase.C])
-    bus2 = _make_bus("bus-abc-2", [Phase.A, Phase.B, Phase.C])
-    with pytest.raises(ValueError, match="Number of branch phases"):
-        MatrixImpedanceBranch(
-            name="branch-ab-count-mismatch",
-            buses=[bus1, bus2],
-            length=Distance(100, "meter"),
-            phases=[Phase.A, Phase.B],
-            substation=DistributionSubstation.example(),
-            feeder=DistributionFeeder.example(),
-            equipment=_two_phase_equipment(),
-        )

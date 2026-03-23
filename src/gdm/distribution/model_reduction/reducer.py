@@ -77,15 +77,16 @@ def _reduce_system(
     agg_timeseries: bool = False,
     time_series_type: Type[TimeSeriesData] = SingleTimeSeries,
 ) -> DistributionSystem:
+    original_tree = dist_system.get_directed_graph()
     reduced_system = dist_system.get_subsystem(
         bus_subset,
         name,
         keep_timeseries=agg_timeseries,
         time_series_type=time_series_type,
+        directed_graph=original_tree,
     )
 
-    split_phase_mapping = dist_system.get_split_phase_mapping()
-    original_tree = dist_system.get_directed_graph()
+    split_phase_mapping = dist_system.get_split_phase_mapping(directed_graph=original_tree)
     reduced_network_tree = original_tree.subgraph(bus_subset)
     ts_agg_func_mapper: dict[Union[Type[DistributionLoad], Type[DistributionSolar]], Callable] = {
         DistributionLoad: get_aggregated_load_timeseries,
@@ -103,7 +104,11 @@ def _reduce_system(
                 for snode in nx.descendants(original_tree, successor)
             ] + list(sucessors_diff)
             subtree = original_tree.subgraph(successors_descendants)
-            subtree_system = dist_system.get_subsystem(subtree.nodes, "")
+            subtree_system = dist_system.get_subsystem(
+                list(subtree.nodes),
+                "",
+                directed_graph=original_tree,
+            )
             model_types = subtree_system.get_model_types_with_field_type(DistributionBus)
             for model_type in model_types:
                 agg_component = _get_aggregated_bus_component(

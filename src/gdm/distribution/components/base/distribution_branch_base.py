@@ -41,15 +41,6 @@ class DistributionBranchBase(InServiceDistributionComponentBase, ABC):
                 msg = f"Conductor phase ({phase=}) does not match bus phases ({bus.phases=})"
                 raise ValueError(msg)
 
-        num_branch_phases = len(self.phases)
-        if not any(num_branch_phases == len(bus.phases) for bus in self.buses):
-            bus_phase_counts = {bus.name: len(bus.phases) for bus in self.buses}
-            msg = (
-                f"Number of branch phases ({num_branch_phases}) must match the number of phases "
-                f"of at least one connected bus. Connected bus phase counts: {bus_phase_counts}"
-            )
-            raise ValueError(msg)
-
         if self.buses[0].name == self.buses[1].name:
             msg = (
                 f"From bus {self.buses[0].name=} and to bus"
