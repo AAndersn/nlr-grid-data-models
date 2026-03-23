@@ -21,7 +21,7 @@ jobs:
           python -m pip install -e ".[dev,mcp]"
       - name: Verify MCP installation
         run: |
-          python -c "import mcp; print(f'MCP version: {mcp.__version__}')"
+          python -c "import importlib.metadata as md; import mcp.server; print(f'MCP version: {md.version(\"mcp\")}')"
       - name: Run pytest
         run: |
           pytest -v --cov --cov-report=xml
