@@ -25,7 +25,7 @@ class MultipleOrEmptyVsourceFound(GDMBaseException):
     """Raises this error if multiple or no vsource found."""
 
 
-class InconsistentTimeseriesAggregation(GDMBaseException):
+class InconsistentTimeSeriesAggregation(GDMBaseException):
     """Raises this error if time series data aggregated are inconsistent."""
 
 
@@ -38,14 +38,14 @@ class NoComponentsFoundError(GDMBaseException):
 
 
 class IncompatibleTimeSeries(GDMBaseException):
-    """Raised if incompatible timeseries is passed as time_series_type."""
+    """Raised if incompatible time series is passed as time_series_type."""
 
 
 class NoTimeSeriesDataFound(GDMBaseException):
-    """Raised if no timeseries data found for a component when it is expected."""
+    """Raised if no time series data found for a component when it is expected."""
 
 
-class TimeseriesVariableDoesNotExist(GDMBaseException):
+class TimeSeriesVariableDoesNotExist(GDMBaseException):
     """Raised if expected time series variable does not exist for a component."""
 
 
@@ -55,3 +55,8 @@ class UnsupportedVariableError(GDMBaseException):
 
 class NonuniqueCommponentsTypesInParallel(GDMBaseException):
     """Raised if two components of different type are connected in parallel between two node (e.g. switch and a transformer)."""
+
+
+# Backward-compatible exception aliases.
+InconsistentTimeseriesAggregation = InconsistentTimeSeriesAggregation
+TimeseriesVariableDoesNotExist = TimeSeriesVariableDoesNotExist

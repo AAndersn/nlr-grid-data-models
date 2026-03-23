@@ -276,7 +276,8 @@ class DistributionSystem(System):
         self,
         bus_names: list[str],
         name: str,
-        keep_timeseries: bool = False,
+        keep_time_series: bool = False,
+        keep_timeseries: bool | None = None,
         time_series_type: Type[TimeSeriesData] = SingleTimeSeries,
         directed_graph: nx.DiGraph | None = None,
     ) -> "DistributionSystem":
@@ -288,8 +289,10 @@ class DistributionSystem(System):
             List of bus names
         name: str
             Name of the subsystem.
-        keep_timeseries: bool
-            Set this flag to retain timeseries data associated with the component.
+        keep_time_series: bool
+            Set this flag to retain time series data associated with the component.
+        keep_timeseries: bool | None
+            Deprecated alias for keep_time_series.
         time_series_type: Type[TimeSeriesData]
             Type of time series data. Defaults to: SingleTimeSeries
         directed_graph: nx.DiGraph | None
@@ -299,6 +302,9 @@ class DistributionSystem(System):
         -------
         DistributionSystem
         """
+        if keep_timeseries is not None:
+            keep_time_series = keep_timeseries
+
         tree = directed_graph if directed_graph is not None else self.get_directed_graph()
         subtree = tree.subgraph(bus_names)
         subtree_system = DistributionSystem(auto_add_composed_components=True, name=name)
@@ -312,7 +318,7 @@ class DistributionSystem(System):
             parent_components = self.list_parent_components(self.get_component(DistributionBus, u))
             self._add_to_subsystem(subtree_system, parent_components, bus_names)
 
-        if keep_timeseries:
+        if keep_time_series:
             for comp in subtree_system.get_components(
                 Component,
                 filter_func=lambda x: self.has_time_series(x, time_series_type=time_series_type),

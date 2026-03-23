@@ -28,9 +28,11 @@ def reduce(
     reducer: Annotated[
         ReducerType, typer.Option("-r", "--reducer", help="Reducer type to apply.")
     ] = ReducerType.three_phase,
-    timeseries: Annotated[
+    time_series: Annotated[
         bool,
-        typer.Option("-ts", "--timeseries", help="Include timeseries data in the reduced system."),
+        typer.Option(
+            "-ts", "--time-series", help="Include time series data in the reduced system."
+        ),
     ] = False,
 ):
     """Reduce a GDM distribution system."""
@@ -46,6 +48,6 @@ def reduce(
     sys = DistributionSystem.from_json(gdm_file)
     reducer_func = {"three_phase": reduce_to_three_phase_system}
     new_sys_name = sys.name + "_reduced" if sys.name else None
-    new_sys = reducer_func[reducer.value](sys, new_sys_name, timeseries)
+    new_sys = reducer_func[reducer.value](sys, new_sys_name, time_series)
     new_sys.to_json(target_path)
     typer.echo(str(target_path))
