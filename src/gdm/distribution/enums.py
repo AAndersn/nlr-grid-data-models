@@ -143,6 +143,7 @@ class CustomerClass(str, Enum):
     RESIDENTIAL = "residential"
     COMMERCIAL = "commercial"
     INDUSTRIAL = "industrial"
+    UTILITY = "utility"
 
 
 class BillingDemandBasis(str, Enum):

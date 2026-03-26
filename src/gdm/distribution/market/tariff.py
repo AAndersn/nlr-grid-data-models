@@ -31,6 +31,9 @@ class TOURatePeriod(Component):
 
 class DemandCharge(Component):
     name: str = ""
+    months: List[Month] = Field(
+        ..., min_length=1, description="Months for which this demand charge applies"
+    )
     rate: float = Field(..., gt=0, description="Rate for demand charge in $/kW")
     billing_demand_basis: BillingDemandBasis = Field(
         ..., description="Basis for billing demand calculation"
@@ -39,9 +42,16 @@ class DemandCharge(Component):
         ..., description="Time periods when the demand charge applies"
     )
 
+    @model_validator(mode="after")
+    def check_no_duplicate_months(self) -> "DemandCharge":
+        if len(self.months) != len(set(self.months)):
+            raise ValueError("Duplicate months are not allowed within a single DemandCharge")
+        return self
+
     @classmethod
     def example(cls) -> "DemandCharge":
         return DemandCharge(
+            months=[Month.JUNE, Month.JULY, Month.AUGUST],
             rate=12.50,
             billing_demand_basis=BillingDemandBasis.PEAK_15MIN,
             time_applicability=[TOURatePeriod.example()],
@@ -50,13 +60,23 @@ class DemandCharge(Component):
 
 class SeasonalTOURates(Component):
     name: str = ""
-    season: Month = Field(..., description="Month for the TOU rates")
-    tou_periods: List[TOURatePeriod] = Field(..., description="List of TOU periods for the month")
+    months: List[Month] = Field(
+        ..., min_length=1, description="Months for which these TOU rates apply"
+    )
+    tou_periods: List[TOURatePeriod] = Field(
+        ..., description="List of TOU periods for the specified months"
+    )
+
+    @model_validator(mode="after")
+    def check_no_duplicate_months(self) -> "SeasonalTOURates":
+        if len(self.months) != len(set(self.months)):
+            raise ValueError("Duplicate months are not allowed within a single SeasonalTOURates")
+        return self
 
     @classmethod
     def example(cls) -> "SeasonalTOURates":
         return SeasonalTOURates(
-            season=Month.JULY,
+            months=[Month.JUNE, Month.JULY, Month.AUGUST],
             tou_periods=[
                 TOURatePeriod.example(),
                 TOURatePeriod(
@@ -81,7 +101,7 @@ class TieredRate(Component):
 
 class FixedCharge(Component):
     name: str = ""
-    amount: float = Field(..., gt=0, description="Amount of the fixed charge in $/month")
+    amount: float = Field(..., ge=0, description="Amount of the fixed charge in $/month")
     description: Optional[str] = Field(None, description="Description of the fixed charge")
 
     @classmethod
@@ -93,7 +113,7 @@ class DistributionTariff(Component):
     name: str = Field(..., description="Name of the tariff")
     utility: str = Field(..., description="Name of the utility company")
     customer_class: CustomerClass = Field(..., description="Customer class for the tariff")
-    fixed_charge: FixedCharge = Field(..., description="Fixed charge for the tariff")
+    fixed_charge: Optional[FixedCharge] = Field(None, description="Fixed charge for the tariff")
     seasonal_tou: List[SeasonalTOURates] = Field(
         ..., description="Seasonal TOU rates for the tariff"
     )
@@ -103,6 +123,13 @@ class DistributionTariff(Component):
     tiered_energy_charges: Optional[List[TieredRate]] = Field(
         None, description="List of tiered energy charges for the tariff"
     )
+
+    @model_validator(mode="after")
+    def check_no_overlapping_months(self) -> "DistributionTariff":
+        all_months = [m for entry in self.seasonal_tou for m in entry.months]
+        if len(all_months) != len(set(all_months)):
+            raise ValueError("A month must not appear in more than one SeasonalTOURates entry")
+        return self
 
     @classmethod
     def example(cls) -> "DistributionTariff":
@@ -114,7 +141,7 @@ class DistributionTariff(Component):
             seasonal_tou=[
                 SeasonalTOURates.example(),
                 SeasonalTOURates(
-                    season=Month.JANUARY,
+                    months=[Month.DECEMBER, Month.JANUARY, Month.FEBRUARY],
                     tou_periods=[
                         TOURatePeriod.example(),
                         TOURatePeriod(
