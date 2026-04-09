@@ -24,7 +24,7 @@ dependencies = [
   "semver",
   "networkx", 
   "pydantic",
-  "infrasys~=1.0", 
+  "infrasys~=1.1", 
   "importlib_metadata",
   "typer",
   "pandas~=2.2.3",
