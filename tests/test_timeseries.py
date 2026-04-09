@@ -30,7 +30,7 @@ class CustomTimeSeries:
 
 def process_time_series(df: pd.DataFrame, value_column: str) -> pd.DataFrame:
     """Aggregate and pivot the time series DataFrame."""
-    grouped_df = df.groupby(["name", "timestamp"], as_index=False).sum([value_column])
+    grouped_df = df.groupby(["name", "timestamp"], as_index=False)[[value_column]].sum()
     pivoted_df = grouped_df.pivot(index="timestamp", columns="name", values=value_column)
     return pivoted_df
 
